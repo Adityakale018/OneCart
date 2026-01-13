@@ -36,3 +36,34 @@ npm start
 cd admin
 npm install
 npm start
+
+## 📸 Project Screenshots
+> ⚠️ Screenshots are from local development environment
+
+### 🏠 User Website
+
+#### Home Page
+![Home Page](screenshots/home.png)
+
+#### Collections Page
+![Collections](screenshots/collection.png)
+
+#### Cart Page
+![Cart](screenshots/cart.png)
+
+#### Login Page
+![Login](screenshots/login.png)
+
+#### About Page
+![About](screenshots/about.png)
+
+#### Contact Page
+![Contact](screenshots/contact.png)
+
+---
+
+### 🧑‍💼 Admin Panel
+
+#### Admin Dashboard
+![Admin Dashboard](screenshots/admin-dashboard.png)
+
