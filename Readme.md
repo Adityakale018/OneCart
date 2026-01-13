@@ -37,6 +37,22 @@ cd admin
 npm install
 npm start
 
+## 🔐 Environment Variables
+
+This project uses environment variables for security.
+Create a `.env` file in the backend folder using `.env.example`.
+
+### Backend
+- PORT
+- MONGODB_URL
+- JWT_SECRET
+- ADMIN_EMAIL
+- ADMIN_PASSWORD
+- CLOUDINARY_NAME
+- CLOUDINARY_APIKEY
+- CLOUDINARY_APISECRET
+
+
 ## 📸 Project Screenshots
 > ⚠️ Screenshots are from local development environment
 
