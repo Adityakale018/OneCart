@@ -10,7 +10,7 @@
 - Node.js
 - Express.js
 - MongoDB
-- Razorpay
+- Razorpay 
 - JWT Authentication
 
 ## ✨ Features
@@ -25,14 +25,14 @@
 ### Backend
 cd backend
 npm install
-npm start
+npm run dev
 
 ### Frontend
 cd frontend
 npm install
-npm start
+npm run dev
 
 ### Admin
 cd admin
 npm install
-npm start
+npm run dev
