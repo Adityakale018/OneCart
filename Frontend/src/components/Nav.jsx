@@ -7,7 +7,7 @@ import { IoMdHome } from "react-icons/io";
 import { HiOutlineCollection } from "react-icons/hi";
 import { userDatacontext } from '../context/UserContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { authDataContext } from '../context/authContext';
+import { authDataContext } from '../context/AuthContext';
 import { shopDataContext } from '../context/ShopContext';
 import axios from 'axios';
 
