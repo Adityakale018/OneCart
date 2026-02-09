@@ -14,7 +14,7 @@ let port = process.env.PORT || 6000 ;
 
 let app = express()
 app.use(cors({
-    origin:["http://localhost:5173", // admin panel
+    origin:["https://onecart-admin-zjpy.onrender.com", // admin panel
     "https://onecart-frontend-ragv.onrender.com"],
     credentials:true
 }))
