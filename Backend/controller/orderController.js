@@ -1,9 +1,71 @@
 import Order from "../model/oderModel.js";
 import User from "../model/UserModel.js";
+import razorpay from "razorpay";
+import dotenv from "dotenv";
+dotenv.config();
 
+const currency = "INR";
 
+const razorpayInstance = new razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
+export const placeOrderRazorpay = async(req, res) => {
+    try{
+        const {amount,items,address} = req.body;
+        const userId = req.userId;
+        const orderData = {
+            items, 
+            amount,
+            address,
+            userId,
+            paymentMethod: "Razorpay",
+            paymentStatus: "Pending",
+            payment: false,
+            date:Date.now()
+        }
+        const newOrder = new Order(orderData);
+        await newOrder.save();
 
+        const options = {
+            amount: amount * 100, // Amount in paise
+            currency: currency.toUpperCase(),
+            receipt: newOrder._id.toString(),
+        }
+
+        await razorpayInstance.orders.create(options, (error, order) => {
+            if(error){
+                console.log(error);
+                return res.status(500).json({success: false, message: "Razorpay order creation failed" });
+            }
+            res.status(200).json({success: true, orderId: order.id, amount: order.amount, currency: order.currency});
+        });
+    }
+    catch(error){
+        console.log(error)
+        return res.status(500).json({success: false, message: error. message });
+    }
+}
+
+export const verifyRazorpay = async(req, res) => {
+    try {
+        const userId = req.userId;
+        const {razorpay_order_id} = req.body;
+        const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+        if(orderInfo.status === "paid"){
+            await Order.findByIdAndUpdate(orderInfo.receipt, {paymentStatus: "Paid", payment: true});
+            await User.findByIdAndUpdate(userId, { cartData:{} });
+            return res.status(200).json({success: true, message: "Payment verified and order updated successfully"});
+        }else{
+            return res.status(400).json({success: false, message: "Payment not successful"});
+        }   
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({success: false, message: error.message});
+    }
+}
 export const PlaceOrder = async(req, res) => {
     try {
         // ✅ Extract paymentMethod, paymentStatus, and payment from req.body

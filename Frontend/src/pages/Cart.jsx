@@ -158,7 +158,7 @@ function Cart() {
                     }
                   }}
                   disabled={cartData.length === 0}
-                  className='w-full px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled: cursor-not-allowed shadow-lg shadow-violet-500/30'
+                  className='w-full px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all  cursor-pointer shadow-lg shadow-violet-500/30'
                 >
                   Proceed to Checkout
                 </button>

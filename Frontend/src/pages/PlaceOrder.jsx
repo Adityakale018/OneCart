@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import Title from '../components/Title'
 import CartTotal from '../components/CartTotal'
 import razorpay from "../assets/Razorpay.svg"
@@ -24,10 +24,67 @@ function PlaceOrder() {
   });
   const [loading, setLoading] = useState(false)
 
+  // ✅ Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    }
+  }, []);
+
   const onChangeHandler = (e) => {
     const name = e.target.name;
-    const value = e.target. value;
+    const value = e.target.value;
     setFormData({...formData, [name]: value});
+  }
+
+  const initPay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "OneCart",
+      description: "Order Payment",
+      order_id: order.orderId,
+      handler: async (response) => {
+        console.log(response);
+        try {
+          const {data} = await axios.post(serverUrl + "/api/order/verifyrazorpay", response, {withCredentials: true});
+          if(data.success){
+            setCartItem({});
+            navigate("/order");
+          } else {
+            alert("Payment verification failed");
+          }
+        } catch (error) {
+          console.log(error);
+          alert("Payment verification failed");
+        }
+      },
+      prefill: {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        contact: formData.phone
+      },
+      theme: {
+        color: "#7c3aed"
+      },
+      modal: {
+        ondismiss: function() {
+          setLoading(false); // ✅ Reset loading when modal is closed
+          console.log("Payment cancelled");
+        }
+      }
+    };
+    
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   }
 
   const onSubmitHandler = async(e) => {
@@ -52,7 +109,7 @@ function PlaceOrder() {
       let orderData = {
         address: formData,
         items: orderItems,
-        amount:  getTotalAmount() + delivery_fee,
+        amount: getTotalAmount() + delivery_fee,
         paymentMethod: method,
         paymentStatus: method === 'cod' ? 'COD' : 'Pending',
         payment: false
@@ -62,7 +119,7 @@ function PlaceOrder() {
         case 'cod':
           const result = await axios.post(serverUrl + "/api/order/placeorder", orderData, {withCredentials: true})
           console.log(result.data)
-          if(result.data){
+          if(result.data.success){
             setCartItem({})
             navigate("/order")
           } else {
@@ -70,6 +127,16 @@ function PlaceOrder() {
             alert("Order failed. Please try again.")
           }
           break;
+
+        case 'razorpay':
+          const resultRazorpay = await axios.post(serverUrl + "/api/order/razorpay", orderData, {withCredentials: true})
+          if(resultRazorpay.data.success){
+            initPay(resultRazorpay.data)
+          } else {
+            alert("Failed to create Razorpay order")
+          }
+          break;  // ✅ Added missing break
+          
         default:
           break;
       }
@@ -77,13 +144,16 @@ function PlaceOrder() {
       console.log(error)
       alert("An error occurred. Please try again.")
     } finally {
-      setLoading(false)
+      // ✅ Only reset loading for COD, not for Razorpay (it resets in modal dismiss)
+      if(method === 'cod') {
+        setLoading(false)
+      }
     }
   }
 
   return (
     <div className='w-full min-h-screen bg-slate-950 pt-24 pb-20 md:pb-8'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg: px-8'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         
         {/* Header */}
         <div className='text-center mb-8'>
@@ -94,7 +164,7 @@ function PlaceOrder() {
         <form onSubmit={onSubmitHandler}>
           <div className='grid lg:grid-cols-2 gap-8'>
             
-            {/* Left:  Delivery Information */}
+            {/* Left: Delivery Information */}
             <div className='space-y-6'>
               <div className='bg-slate-900 border border-slate-800 rounded-lg p-6'>
                 <h3 className='text-white text-xl font-bold mb-6'>Delivery Information</h3>
@@ -137,8 +207,8 @@ function PlaceOrder() {
                       value={formData.email}
                       onChange={onChangeHandler}
                       required
-                      className='w-full h-12 bg-slate-950 border border-slate-800 rounded-lg px-4 text-white placeholder-slate-500 focus: outline-none focus:border-violet-600 transition-colors'
-                      placeholder='john@example. com'
+                      className='w-full h-12 bg-slate-950 border border-slate-800 rounded-lg px-4 text-white placeholder-slate-500 focus:outline-none focus:border-violet-600 transition-colors'
+                      placeholder='john@example.com'
                     />
                   </div>
 
@@ -163,7 +233,7 @@ function PlaceOrder() {
                       <input
                         type="text"
                         name='city'
-                        value={formData. city}
+                        value={formData.city}
                         onChange={onChangeHandler}
                         required
                         className='w-full h-12 bg-slate-950 border border-slate-800 rounded-lg px-4 text-white placeholder-slate-500 focus:outline-none focus:border-violet-600 transition-colors'
@@ -178,7 +248,7 @@ function PlaceOrder() {
                         value={formData.state}
                         onChange={onChangeHandler}
                         required
-                        className='w-full h-12 bg-slate-950 border border-slate-800 rounded-lg px-4 text-white placeholder-slate-500 focus: outline-none focus:border-violet-600 transition-colors'
+                        className='w-full h-12 bg-slate-950 border border-slate-800 rounded-lg px-4 text-white placeholder-slate-500 focus:outline-none focus:border-violet-600 transition-colors'
                         placeholder='Maharashtra'
                       />
                     </div>
@@ -273,13 +343,13 @@ function PlaceOrder() {
                 </div>
               </div>
 
-              {/* Place Order Button */}
+              {/* Place Order Button - ✅ Hover works properly now */}
               <button
                 type="submit"
                 disabled={loading}
-                className='w-full h-14 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-bold text-lg rounded-lg transition-all disabled:opacity-50 disabled: cursor-pointer flex items-center justify-center shadow-lg shadow-violet-500/30'
+                className='w-full h-14 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 disabled:from-violet-600 disabled:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-lg rounded-lg transition-all flex items-center justify-center shadow-lg shadow-violet-500/30'
               >
-                {loading ?  (
+                {loading ? (
                   <div className='w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin'></div>
                 ) : (
                   'PLACE ORDER'
