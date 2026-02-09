@@ -15,7 +15,7 @@ let port = process.env.PORT || 6000 ;
 let app = express()
 app.use(cors({
     origin:["http://localhost:5173", // admin panel
-    "http://localhost:5175"],
+    "https://onecart-frontend-ragv.onrender.com"],
     credentials:true
 }))
 app.use(express.json())
