@@ -4,7 +4,7 @@ import Logo from "../assets/vcart_logo.png";
 import google from "../assets/google.png"
 import { IoEyeOutline, IoEye } from "react-icons/io5";
 import { FiMail, FiLock, FiUser } from "react-icons/fi";
-import { authDataContext } from "../context/authContext";
+import { authDataContext } from "../context/AuthContext";
 import axios from 'axios'
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../utils/Firebase";
