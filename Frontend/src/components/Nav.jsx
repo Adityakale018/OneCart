@@ -10,6 +10,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { authDataContext } from '../context/AuthContext';
 import { shopDataContext } from '../context/ShopContext';
 import axios from 'axios';
+import { signOut } from "firebase/auth";
+import { auth } from "../../utils/Firebase";
 
 function Nav() {
     const navigate = useNavigate()
@@ -39,15 +41,32 @@ function Nav() {
     }, [showProfile])
 
     const handleLogout = async () => {
-        try {
-            const result = await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
-            console.log(result.data)
-            getCurrentUser()
-            setshowProfile(false)
-        } catch (error) {
-            console.log(error)
+    try {
+        const result = await axios.get(serverUrl + "/api/auth/logout", { 
+            withCredentials: true 
+        });
+        
+        console.log(result.data);
+        
+        
+        if (result.data.success) {
+          
+            if (auth.currentUser) {
+                await signOut(auth);
+            }
+            
+            
+            getCurrentUser();
+            setshowProfile(false);
+            
+           
+            navigate("/login");
         }
+    } catch (error) {
+        console.log("Logout error:", error);
+        alert("Logout failed. Please try again.");
     }
+}
 
     const isActive = (path) => location.pathname === path
 
