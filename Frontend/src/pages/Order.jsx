@@ -1,173 +1,181 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Title from '../components/Title'
 import { shopDataContext } from '../context/ShopContext'
 import { authDataContext } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { FiPackage, FiShoppingBag, FiCreditCard, FiCalendar, FiRefreshCw, FiChevronRight } from 'react-icons/fi'
+
+/* Status pill */
+const StatusPill = ({ status }) => {
+  const map = {
+    delivered:   { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200',  dot: 'bg-emerald-500' },
+    shipped:     { cls: 'bg-blue-50 text-blue-700 border-blue-200',            dot: 'bg-blue-500'    },
+    'out for delivery': { cls: 'bg-indigo-50 text-indigo-700 border-indigo-200', dot: 'bg-indigo-500' },
+    processing:  { cls: 'bg-amber-50 text-amber-700 border-amber-200',         dot: 'bg-amber-500'   },
+    'order placed': { cls: 'bg-violet-50 text-violet-700 border-violet-200',   dot: 'bg-violet-500'  },
+    cancelled:   { cls: 'bg-red-50 text-red-700 border-red-200',               dot: 'bg-red-500'     },
+    pending:     { cls: 'bg-gray-50 text-gray-600 border-gray-200',            dot: 'bg-gray-400'    },
+  }
+  const key = status?.toLowerCase()
+  const { cls, dot } = map[key] || map.pending
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-xs font-semibold border px-3 py-1.5 rounded-full ${cls}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+      {status}
+    </span>
+  )
+}
 
 function Order() {
-  let [orderData, setOrderData] = useState([])
-  let [loading, setLoading] = useState(true)
-  let {serverUrl, currency} = useContext(shopDataContext)
-  let navigate = useNavigate()
+  const [orderData, setOrderData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const { serverUrl, currency } = useContext(authDataContext)
+  const { products } = useContext(shopDataContext)
+  const navigate = useNavigate()
 
   const loadOrderData = async () => {
     setLoading(true)
     try {
-      const result = await axios.post(serverUrl + "/api/order/userorder", {}, {withCredentials: true})
-      if(result.data){
-        let allOrdersItem = []
-        result.data.map((order) => {
-          order.items.map((item) => {
-            item['status'] = order.status
-            item['payment'] = order. payment
-            item['paymentMethod'] = order.paymentMethod
-            item['date'] = order. date
-            item['orderId'] = order._id
-            allOrdersItem. push(item)
+      const result = await axios.post(serverUrl + '/api/order/userorder', {}, { withCredentials: true })
+      if (result.data) {
+        const allItems = []
+        result.data.forEach((order) => {
+          order.items.forEach((item) => {
+            allItems.push({
+              ...item,
+              status: order.status,
+              payment: order.payment,
+              paymentMethod: order.paymentMethod,
+              date: order.date,
+              orderId: order._id,
+            })
           })
         })
-        setOrderData(allOrdersItem.reverse())
+        setOrderData(allItems.reverse())
       }
-    } catch (error) {
-      console.log(error)
+    } catch (err) {
+      console.error(err)
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    loadOrderData()
-  }, [])
-
-  const getStatusColor = (status) => {
-    switch(status?. toLowerCase()) {
-      case 'delivered':
-        return 'bg-emerald-500'
-      case 'shipped':
-      case 'out for delivery':
-        return 'bg-blue-500'
-      case 'processing':
-      case 'order placed':
-        return 'bg-yellow-500'
-      case 'cancelled':
-        return 'bg-red-500'
-      default:
-        return 'bg-violet-500'
-    }
-  }
+  useEffect(() => { loadOrderData() }, [])
 
   return (
-    <div className='w-full min-h-screen bg-slate-950 pt-24 pb-20 md:pb-8'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg: px-8'>
-        
-        {/* Header */}
-        <div className='text-center mb-8'>
-          <Title text1={"MY "} text2={"ORDERS"}/>
-          <p className='text-slate-400 mt-2'>
-            {orderData.length} {orderData.length === 1 ? 'order' : 'orders'} found
-          </p>
+    <div className="min-h-screen bg-gray-50 pt-4 pb-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Page header */}
+        <div className="flex items-center justify-between py-6 border-b border-gray-200 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
+            {!loading && (
+              <p className="text-sm text-gray-500 mt-0.5">
+                {orderData.length} {orderData.length === 1 ? 'order' : 'orders'}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={loadOrderData}
+            className="flex items-center gap-2 text-sm font-semibold text-[#ff3f6c] border border-[#ff3f6c] rounded-lg px-4 py-2 hover:bg-[#ff3f6c] hover:text-white transition-colors"
+          >
+            <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
         </div>
 
-        {loading ? (
-          // Loading State
-          <div className='flex items-center justify-center py-20'>
-            <div className='w-12 h-12 border-4 border-violet-600/30 border-t-violet-600 rounded-full animate-spin'></div>
+        {/* Loading */}
+        {loading && (
+          <div className="flex items-center justify-center py-32">
+            <div className="w-10 h-10 border-4 border-[#ff3f6c]/20 border-t-[#ff3f6c] rounded-full animate-spin" />
           </div>
-        ) : orderData.length === 0 ?  (
-          // Empty State
-          <div className='flex flex-col items-center justify-center py-20'>
-            <div className='w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center mb-6'>
-              <span className='text-5xl'>📦</span>
+        )}
+
+        {/* Empty */}
+        {!loading && orderData.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-32 text-center">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+              <FiPackage className="w-9 h-9 text-gray-400" />
             </div>
-            <h3 className='text-white text-2xl font-bold mb-2'>No orders yet</h3>
-            <p className='text-slate-400 text-center mb-8'>Start shopping to see your orders here! </p>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">No orders yet</h3>
+            <p className="text-gray-500 mb-8">Start shopping to see your orders here!</p>
             <button
               onClick={() => navigate('/collection')}
-              className='px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all'
+              className="px-8 py-3 bg-[#ff3f6c] text-white font-bold rounded-lg hover:bg-[#e8365d] transition-colors"
             >
               Start Shopping
             </button>
           </div>
-        ) : (
-          // Orders List
-          <div className='space-y-4'>
+        )}
+
+        {/* Orders list */}
+        {!loading && orderData.length > 0 && (
+          <div className="space-y-4">
             {orderData.map((item, index) => (
-              <div 
-                key={index} 
-                className='bg-slate-900 border border-slate-800 rounded-lg p-4 md:p-6 hover:border-violet-600/50 transition-colors'
+              <div
+                key={index}
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
               >
-                <div className='flex flex-col md:flex-row gap-4'>
-                  
-                  {/* Product Image */}
-                  <div 
-                    className='w-full md:w-32 h-32 flex-shrink-0 bg-slate-800 rounded-lg overflow-hidden cursor-pointer'
+                {/* Order top bar */}
+                <div className="bg-gray-50 border-b border-gray-100 px-5 py-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <FiCalendar className="w-3.5 h-3.5" />
+                      {new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <FiCreditCard className="w-3.5 h-3.5" />
+                      {item.paymentMethod?.toUpperCase()}
+                    </span>
+                    <span className="text-gray-400">#{item.orderId?.slice(-8).toUpperCase()}</span>
+                  </div>
+                  <StatusPill status={item.status} />
+                </div>
+
+                {/* Product row */}
+                <div className="p-5 flex gap-4">
+                  {/* Image */}
+                  <div
+                    className="w-20 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
                     onClick={() => navigate(`/productdetail/${item._id}`)}
                   >
-                    <img 
-                      src={item.image1} 
+                    <img
+                      src={item.image1}
                       alt={item.name}
-                      className='w-full h-full object-cover hover:scale-110 transition-transform duration-300'
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
                   </div>
 
-                  {/* Order Details */}
-                  <div className='flex-1 space-y-3'>
-                    
-                    {/* Product Name */}
-                    <h3 
-                      className='text-white font-semibold text-lg cursor-pointer hover:text-violet-400 transition-colors'
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3
+                      className="font-bold text-gray-900 text-sm mb-1 cursor-pointer hover:text-[#ff3f6c] transition-colors truncate"
                       onClick={() => navigate(`/productdetail/${item._id}`)}
                     >
                       {item.name}
                     </h3>
-
-                    {/* Price, Quantity, Size */}
-                    <div className='flex flex-wrap items-center gap-4 text-sm'>
-                      <div className='flex items-center gap-2'>
-                        <span className='text-slate-500'>Price:</span>
-                        <span className='text-violet-400 font-semibold'>{currency}{item.price}</span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <span className='text-slate-500'>Quantity:</span>
-                        <span className='text-white'>{item.quantity}</span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <span className='text-slate-500'>Size:</span>
-                        <span className='px-2 py-1 bg-slate-800 text-white rounded text-xs'>{item.size}</span>
-                      </div>
+                    <div className="flex flex-wrap items-center gap-3 text-sm mt-2">
+                      <span className="font-bold text-gray-900">{currency}{item.price}</span>
+                      <span className="bg-gray-100 text-gray-700 text-xs font-semibold px-2 py-1 rounded">
+                        Size: {item.size}
+                      </span>
+                      <span className="text-gray-500 text-xs">Qty: {item.quantity}</span>
                     </div>
-
-                    {/* Date & Payment */}
-                    <div className='flex flex-wrap items-center gap-4 text-sm text-slate-400'>
-                      <div className='flex items-center gap-2'>
-                        <span>📅</span>
-                        <span>{new Date(item.date).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}</span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <span>💳</span>
-                        <span className='capitalize'>{item.paymentMethod}</span>
-                      </div>
-                    </div>
-
-                    {/* Status Badge */}
-                    <div className='flex items-center gap-2'>
-                      <div className={`w-2 h-2 rounded-full ${getStatusColor(item.status)}`}></div>
-                      <span className='text-white font-medium capitalize'>{item.status}</span>
-                    </div>
+                    <p className="text-xs text-emerald-600 font-semibold mt-3 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                      Free 14-day returns
+                    </p>
                   </div>
 
-                  {/* Track Order Button */}
-                  <div className='flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2'>
+                  {/* Track button */}
+                  <div className="flex-shrink-0 flex items-center">
                     <button
                       onClick={loadOrderData}
-                      className='px-4 py-2 bg-slate-800 hover:bg-violet-600 text-white text-sm font-semibold rounded-lg transition-colors'
+                      className="flex items-center gap-1 text-sm font-semibold text-[#ff3f6c] border border-[#ff3f6c] px-4 py-2 rounded-lg hover:bg-[#ff3f6c] hover:text-white transition-colors whitespace-nowrap"
                     >
-                      Track Order
+                      Track
+                      <FiChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

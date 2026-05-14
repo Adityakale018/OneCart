@@ -4,7 +4,7 @@ export const authDataContext = createContext()
 
 function AuthContext({children}) {
 
-    let serverUrl = "https://onecart-backend-wtab.onrender.com"
+    let serverUrl = import.meta.env.DEV ? "http://localhost:8000" : "https://onecart-backend-wtab.onrender.com"
     let value = { serverUrl }
         
    

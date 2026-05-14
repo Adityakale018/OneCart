@@ -4,7 +4,7 @@ import BestSeller from '../components/BestSeller'
 
 function Product() {
   return (
-    <div className='w-full bg-slate-950'>
+    <div className='w-full bg-white'>
       <LatestCollection />
       <BestSeller />
     </div>

@@ -1,119 +1,134 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import Logo from '../assets/vcart_logo.png'
+import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa'
 
 function Footer() {
   const navigate = useNavigate()
 
   return (
-    <footer className='w-full bg-[#0a0e27] border-t border-slate-800/50 mb-16 md:mb-0'>
-      <div className='max-w-[1600px] mx-auto px-6 py-16'>
-        <div className='grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12'>
+    <footer className='w-full bg-[#FAFBFC] border-t border-gray-200 mt-16 md:mt-24 pb-16 md:pb-0'>
+      <div className='max-w-[1600px] mx-auto px-4 lg:px-12 py-12 md:py-16'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8'>
           
           {/* Brand Section */}
-          <div className='md:col-span-2'>
-            <div className='flex items-center gap-3 mb-6'>
-              <div className='w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl p-2.5 shadow-lg shadow-purple-500/30'>
-                <img src={Logo} alt="OneCart" className='w-full h-full object-contain' />
-              </div>
-              <h3 className='text-2xl font-bold text-white tracking-tight'>OneCart</h3>
+          <div className='lg:col-span-2'>
+            <div className='flex items-center gap-2 mb-6 cursor-pointer' onClick={() => navigate('/')}>
+               <h3 className='text-2xl font-bold tracking-tight text-gray-900'>One<span className='text-[#ff3f6c]'>Cart</span></h3>
             </div>
-            <p className='text-slate-400 text-sm leading-relaxed max-w-md mb-8'>
-              Your all-in-one destination for top-quality products, unbeatable deals, and fast delivery. 
-              Designed to make your shopping experience simple and satisfying.
+            <p className='text-gray-500 text-sm leading-relaxed max-w-sm mb-6'>
+              Your ultimate shopping destination for fashion and lifestyle. High-quality products, unbeatable deals, and fast delivery right to your doorstep.
             </p>
-            <div className='flex gap-3'>
-              <a href='#' className='w-10 h-10 bg-slate-800/60 hover:bg-gradient-to-br hover:from-purple-600 hover:to-purple-800 rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30'>
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
+            <div className='flex gap-4'>
+              <a href='#' className='w-9 h-9 rounded-full bg-white flex items-center justify-center text-gray-500 hover:text-white hover:bg-[#ff3f6c] transition-all shadow-sm'>
+                <FaFacebook className="w-[18px] h-[18px]" />
               </a>
-              <a href='#' className='w-10 h-10 bg-slate-800/60 hover:bg-gradient-to-br hover:from-purple-600 hover:to-purple-800 rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30'>
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
+              <a href='#' className='w-9 h-9 rounded-full bg-white flex items-center justify-center text-gray-500 hover:text-white hover:bg-[#ff3f6c] transition-all shadow-sm'>
+                <FaTwitter className="w-[18px] h-[18px]" />
               </a>
-              <a href='#' className='w-10 h-10 bg-slate-800/60 hover:bg-gradient-to-br hover:from-purple-600 hover:to-purple-800 rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30'>
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
+              <a href='#' className='w-9 h-9 rounded-full bg-white flex items-center justify-center text-gray-500 hover:text-white hover:bg-[#ff3f6c] transition-all shadow-sm'>
+                <FaInstagram className="w-[18px] h-[18px]" />
               </a>
-              <a href='#' className='w-10 h-10 bg-slate-800/60 hover:bg-gradient-to-br hover:from-purple-600 hover:to-purple-800 rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30'>
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
+              <a href='#' className='w-9 h-9 rounded-full bg-white flex items-center justify-center text-gray-500 hover:text-white hover:bg-[#ff3f6c] transition-all shadow-sm'>
+                <FaYoutube className="w-[18px] h-[18px]" />
               </a>
             </div>
           </div>
 
-          {/* Company Links */}
+          {/* ONLINE SHOPPING */}
           <div>
-            <h4 className='text-white font-bold text-base mb-6'>Company</h4>
+            <h4 className='text-gray-900 font-bold text-sm mb-5 tracking-wide uppercase'>Online Shopping</h4>
             <ul className='space-y-3'>
               <li>
-                <button onClick={() => navigate('/')} className='text-slate-400 hover:text-purple-400 text-sm transition-colors'>
-                  Home
+                <button onClick={() => navigate('/collection?category=Kids')} className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
+                  Kids
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/about')} className='text-slate-400 hover:text-purple-400 text-sm transition-colors'>
+                <button onClick={() => navigate('/collection?subCategory=TopWear')} className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
+                  Topwear
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate('/collection?subCategory=BottomWear')} className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
+                  Bottomwear
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate('/collection?subCategory=WinterWear')} className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
+                  Winterwear
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate('/collection?category=beauty')} className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
+                  Beauty
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* USEFUL LINKS */}
+          <div>
+            <h4 className='text-gray-900 font-bold text-sm mb-5 tracking-wide uppercase'>Useful Links</h4>
+            <ul className='space-y-3'>
+              <li>
+                <button onClick={() => navigate('/about')} className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
                   About Us
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/collection')} className='text-slate-400 hover:text-purple-400 text-sm transition-colors'>
-                  Collections
+                <button onClick={() => navigate('/contact')} className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
+                  Contact Us
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/contact')} className='text-slate-400 hover:text-purple-400 text-sm transition-colors'>
-                  Contact
+                <button className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
+                  FAQ
                 </button>
               </li>
               <li>
-                <button className='text-slate-400 hover:text-purple-400 text-sm transition-colors'>
+                <button className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
+                  T&C
+                </button>
+              </li>
+              <li>
+                <button className='text-gray-500 hover:text-[#ff3f6c] hover:font-semibold text-sm transition-all'>
                   Privacy Policy
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* CUSTOMER POLICIES */}
           <div>
-            <h4 className='text-white font-bold text-base mb-6'>Get In Touch</h4>
+            <h4 className='text-gray-900 font-bold text-sm mb-5 tracking-wide uppercase'>Customer Policies</h4>
             <ul className='space-y-3'>
-              <li className='text-slate-400 text-sm hover:text-purple-400 transition-colors cursor-pointer'>
-                +91 8788892095
+              <li className='text-gray-500 text-sm cursor-pointer hover:text-[#ff3f6c] hover:font-semibold transition-all'>
+                Track Orders
               </li>
-              <li className='text-slate-400 text-sm hover:text-purple-400 transition-colors cursor-pointer'>
-                onecart@gmail.com
+              <li className='text-gray-500 text-sm cursor-pointer hover:text-[#ff3f6c] hover:font-semibold transition-all'>
+                Shipping
               </li>
-              <li className='text-slate-400 text-sm hover:text-purple-400 transition-colors cursor-pointer'>
-                +1-123-456-789
+              <li className='text-gray-500 text-sm cursor-pointer hover:text-[#ff3f6c] hover:font-semibold transition-all'>
+                Cancellation
               </li>
-              <li className='text-slate-400 text-sm hover:text-purple-400 transition-colors cursor-pointer'>
-                admin@onecart.com
+              <li className='text-gray-500 text-sm cursor-pointer hover:text-[#ff3f6c] hover:font-semibold transition-all'>
+                Returns
+              </li>
+              <li className='text-gray-500 text-sm cursor-pointer hover:text-[#ff3f6c] hover:font-semibold transition-all'>
+                Grievance Officer
               </li>
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className='border-t border-slate-800/50 mt-12 pt-8'>
+        <div className='border-t border-gray-200 mt-12 pt-8'>
           <div className='flex flex-col md:flex-row justify-between items-center gap-4'>
-            <p className='text-slate-500 text-sm text-center md:text-left'>
-              © 2026 OneCart. All rights reserved.
+            <p className='text-gray-500 text-sm text-center md:text-left'>
+              © {new Date().getFullYear()} OneCart. All rights reserved.
             </p>
-            <div className='flex gap-6 text-sm'>
-              <button className='text-slate-500 hover:text-purple-400 transition-colors'>
-                Terms
-              </button>
-              <button className='text-slate-500 hover:text-purple-400 transition-colors'>
-                Privacy
-              </button>
-              <button className='text-slate-500 hover:text-purple-400 transition-colors'>
-                Cookies
-              </button>
+            <div className='flex gap-2 text-sm text-gray-500 items-center font-semibold'>
+              Made with <span className="text-[#ff3f6c] text-lg">♥</span> for fashion
             </div>
           </div>
         </div>

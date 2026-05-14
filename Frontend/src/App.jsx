@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Routes,Route,BrowserRouter, useLocation, Navigate } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Registration from './pages/Registration'
 import Login from './pages/Login'
 import Home from "./pages/Home";
@@ -14,31 +14,57 @@ import Cart from './pages/Cart';
 import PlaceOrder from './pages/PlaceOrder';
 import Order from './pages/Order';
 import Ai from './components/Ai';
+import SharedCart from './pages/SharedCart';
+import SplitCheckout from './pages/SplitCheckout';
 
-
-function App() {
-  let {userData} = useContext(userDatacontext)
-  let location = useLocation()
-  return (
-    <>
-    {userData &&< Nav/>}
-      <Routes>
-        <Route path='/Login' element={userData ? (<Navigate to = {Location.state?.from || "/"}/>):(<Login/>)}/>
-        <Route path='/signup' element={userData ? (<Navigate to = {Location.state?.from || "/"}/>):(<Registration/>)}/>
-        <Route path='/' element={userData ? <Home/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-        <Route path='/about' element={userData ? <About/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-        <Route path='/collection' element={userData ? <Collections/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-        <Route path='/product' element={userData ? <Product/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-        <Route path='/contact' element={userData ? <Contact/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-        <Route path='/productdetail/:productId' element={userData ? <ProductDetail/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-        <Route path='/cart' element={userData ? <Cart/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-        <Route path='/placeorder' element={userData ? <PlaceOrder/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-        <Route path='/order' element={userData ? <Order/> : <Navigate to ="/login" state={{from:location.pathname}}/>}/>
-      </Routes>
-      <Ai/>
-    </>
-  )
-   
+/* ─── Protected Route wrapper ────────────────────────────────────── */
+function Protected({ children }) {
+    const { userData } = useContext(userDatacontext);
+    const location = useLocation();
+    if (!userData) {
+        return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    }
+    return children;
 }
 
-export default App
+function App() {
+    const { userData } = useContext(userDatacontext);
+    const location = useLocation();
+
+    return (
+        <>
+            {userData && <Nav />}
+            <Routes>
+                {/* Auth routes (redirect to home if logged in) */}
+                <Route
+                    path="/login"
+                    element={userData ? <Navigate to={location.state?.from || "/"} replace /> : <Login />}
+                />
+                <Route
+                    path="/signup"
+                    element={userData ? <Navigate to={location.state?.from || "/"} replace /> : <Registration />}
+                />
+
+                {/* Protected routes */}
+                <Route path="/" element={<Protected><Home /></Protected>} />
+                <Route path="/about" element={<Protected><About /></Protected>} />
+                <Route path="/collection" element={<Protected><Collections /></Protected>} />
+                <Route path="/product" element={<Protected><Product /></Protected>} />
+                <Route path="/contact" element={<Protected><Contact /></Protected>} />
+                <Route path="/productdetail/:productId" element={<Protected><ProductDetail /></Protected>} />
+                <Route path="/cart" element={<Protected><Cart /></Protected>} />
+                <Route path="/placeorder" element={<Protected><PlaceOrder /></Protected>} />
+                <Route path="/order" element={<Protected><Order /></Protected>} />
+
+                {/* ── NEW: Shared Cart & Split Payment ── */}
+                <Route path="/shared-cart/:cartId" element={<Protected><SharedCart /></Protected>} />
+                <Route path="/split-checkout/:cartId" element={<Protected><SplitCheckout /></Protected>} />
+            </Routes>
+
+            {/* Global AI assistant (only when logged in) */}
+            {userData && <Ai />}
+        </>
+    );
+}
+
+export default App;

@@ -61,7 +61,6 @@ function ShopContext({children}) {
         setCartItem(result.data.cartData || {})
       } catch (error) {
         console.log(error)
-        toast.error(error.message)
       }
     }
 
@@ -101,12 +100,13 @@ function ShopContext({children}) {
       let totalAmount = 0;
       for(const items in cartItem){
         let itemInfo = products.find((product)=>product._id === items);
+        if (!itemInfo) continue;
         for(const item in cartItem[items]){
           try{
             if(cartItem[items][item]>0){
               totalAmount += cartItem[items][item] * itemInfo.price
             }
-    }catch (error) {
+          }catch (error) {
             console.log(error)
           }
         }

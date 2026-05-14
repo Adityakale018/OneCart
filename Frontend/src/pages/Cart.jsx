@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Title from '../components/Title'
 import { shopDataContext } from '../context/ShopContext'
 import { useNavigate } from 'react-router-dom'
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { FaTimes } from "react-icons/fa";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import CartTotal from '../components/CartTotal';
+import SharedCartPanel from '../components/SharedCartPanel';
 
 function Cart() {
     const {products, cartItem, UpdateQuantity, currency} = useContext(shopDataContext)
@@ -28,147 +28,168 @@ function Cart() {
     }, [cartItem])
 
   return (
-    <div className='w-full min-h-screen bg-slate-950 overflow-x-hidden'>
-      <div className='pt-24 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+    <div className='w-full min-h-screen bg-[#f5f5f6] overflow-x-hidden pb-16'>
+      <div className='pt-8 md:pt-12 px-4 sm:px-6 lg:px-8 max-w-[1200px] mx-auto'>
         
-        {/* Header */}
-        <div className='mb-8'>
-          <Title text1={"YOUR "} text2={"CART"}/>
-          <p className='text-slate-400 text-center mt-2'>
-            {cartData.length} {cartData.length === 1 ? 'item' :  'items'} in your cart
-          </p>
-        </div>
-
-        {cartData. length === 0 ? (
+        {cartData.length === 0 ? (
           // Empty Cart State
-          <div className='flex flex-col items-center justify-center py-20'>
-            <div className='w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center mb-6'>
-              <span className='text-5xl'>🛒</span>
+          <div className='flex flex-col items-center justify-center py-20 bg-white shadow-sm mt-4 rounded'>
+            <div className='w-32 h-32 mb-6'>
+                <img src="https://constant.myntassets.com/checkout/assets/img/empty-bag.webp" alt="Empty Bag" className="w-full h-full object-contain" />
             </div>
-            <h3 className='text-white text-2xl font-bold mb-2'>Your cart is empty</h3>
-            <p className='text-slate-400 text-center mb-8'>Add some products to get started!</p>
+            <h3 className='text-gray-800 text-xl font-bold mb-2'>Hey, it feels so light!</h3>
+            <p className='text-gray-500 text-sm mb-8'>There is nothing in your bag. Let's add some items.</p>
             <button
               onClick={() => navigate('/collection')}
-              className='px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all shadow-lg shadow-violet-500/30'
+              className='px-8 py-3 bg-white border border-[#ff3f6c] text-[#ff3f6c] hover:bg-[#ff3f6c] hover:text-white font-bold rounded uppercase tracking-wide transition-colors'
             >
-              Continue Shopping
+              Add Items from Wishlist
             </button>
           </div>
         ) : (
-          <div className='flex flex-col lg:flex-row gap-6'>
+          <div className='flex flex-col lg:flex-row gap-6 mt-4'>
             
             {/* Cart Items - Left Side */}
             <div className='flex-1 space-y-4'>
-              {cartData.map((item, index) => {
-                let productData = products.find((prod) => prod._id === item._id)
-                if (!productData) return null;
-                
-                return (
-                  <div 
-                    key={index} 
-                    className='bg-slate-900 border border-slate-800 rounded-lg p-4 hover:border-violet-600/50 transition-colors'
-                  >
-                    <div className='flex gap-4'>
-                      
-                      {/* Product Image */}
-                      <div 
-                        className='w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-slate-800 rounded-lg overflow-hidden cursor-pointer'
-                        onClick={() => navigate(`/productdetail/${productData._id}`)}
-                      >
-                        <img 
-                          src={productData.image1} 
-                          alt={productData.name}
-                          className='w-full h-full object-cover hover:scale-110 transition-transform duration-300'
-                        />
-                      </div>
-
-                      {/* Product Info */}
-                      <div className='flex-1 min-w-0'>
-                        <h3 
-                          className='text-white font-semibold text-base sm:text-lg mb-2 cursor-pointer hover:text-violet-400 transition-colors line-clamp-1'
-                          onClick={() => navigate(`/productdetail/${productData._id}`)}
-                        >
-                          {productData.name}
-                        </h3>
-                        
-                        <div className='flex flex-wrap items-center gap-2 sm:gap-4 mb-3'>
-                          <p className='text-violet-400 font-bold text-lg sm:text-xl'>
-                            {currency}{productData.price}
-                          </p>
-                          <div className='px-2 sm:px-3 py-1 bg-slate-800 border border-slate-700 rounded text-slate-300 text-xs sm:text-sm'>
-                            Size: {item.size}
-                          </div>
-                        </div>
-
-                        {/* Quantity Controls */}
-                        <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
-                          <div className='flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg w-fit'>
-                            <button
-                              onClick={() => UpdateQuantity(item._id, item.size, item.quantity - 1)}
-                              className='w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover: bg-slate-700 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed'
-                              disabled={item.quantity <= 1}
-                            >
-                              <FiMinus />
-                            </button>
-                            <span className='w-10 text-center text-white font-semibold text-sm'>
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() => UpdateQuantity(item._id, item.size, item.quantity + 1)}
-                              className='w-8 h-8 flex items-center justify-center text-slate-400 hover: text-white hover:bg-slate-700 transition-colors rounded-r-lg'
-                            >
-                              <FiPlus />
-                            </button>
-                          </div>
-
-                          {/* Subtotal */}
-                          <div className='text-slate-400 text-sm'>
-                            Subtotal: <span className='text-white font-semibold'>{currency}{productData.price * item.quantity}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Delete Button */}
-                      <button
-                        onClick={() => UpdateQuantity(item._id, item.size, 0)}
-                        className='flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors self-start'
-                        title='Remove from cart'
-                      >
-                        <RiDeleteBin6Line className='w-5 h-5' />
-                      </button>
-                    </div>
+              {/* Delivery Address Banner */}
+              <div className="bg-white p-4 rounded shadow-sm border border-gray-100 flex justify-between items-center">
+                  <div className="flex items-center gap-2 text-sm text-gray-800">
+                      Deliver to: <span className="font-bold">New Delhi - 110001</span>
                   </div>
-                )
-              })}
+                  <button className="text-[#ff3f6c] text-sm font-bold border border-[#ff3f6c] px-3 py-1 rounded">CHANGE</button>
+              </div>
+
+              {/* Offers Banner */}
+              <div className="bg-white p-4 rounded shadow-sm border border-gray-100">
+                  <h4 className="font-bold text-gray-800 text-sm mb-1 flex items-center gap-2">
+                     Available Offers
+                  </h4>
+                  <ul className="text-gray-600 text-xs list-disc pl-4 space-y-1 mt-2">
+                      <li>10% Instant Discount on SBI Credit Cards on a min spend of $3,000.</li>
+                      <li>Flat $200 Cashback on first order.</li>
+                  </ul>
+              </div>
+
+              {/* Items List */}
+              <div className="bg-white shadow-sm border border-gray-100 rounded p-4">
+                  <div className="flex justify-between items-center mb-4 text-sm">
+                      <span className="font-bold text-gray-800">{cartData.length} Items selected</span>
+                  </div>
+
+                  <div className="space-y-4">
+                    {cartData.map((item, index) => {
+                      let productData = products.find((prod) => prod._id === item._id)
+                      if (!productData) return null;
+                      
+                      return (
+                        <div 
+                          key={index} 
+                          className='relative flex gap-4 p-4 border border-gray-200 rounded hover:shadow-sm transition-shadow bg-white'
+                        >
+                          {/* Product Image */}
+                          <div 
+                            className='w-[100px] h-[130px] flex-shrink-0 bg-gray-100 cursor-pointer'
+                            onClick={() => navigate(`/productdetail/${productData._id}`)}
+                          >
+                            <img 
+                              src={productData.image1} 
+                              alt={productData.name}
+                              className='w-full h-full object-cover'
+                            />
+                          </div>
+
+                          {/* Product Info */}
+                          <div className='flex-1 min-w-0 pr-6'>
+                            <h3 
+                              className='text-gray-900 font-bold text-sm mb-1 cursor-pointer hover:text-[#ff3f6c] transition-colors truncate'
+                              onClick={() => navigate(`/productdetail/${productData._id}`)}
+                            >
+                              BrandName
+                            </h3>
+                            <p className="text-gray-500 text-sm truncate mb-2">{productData.name}</p>
+                            
+                            {/* Controls row */}
+                            <div className="flex flex-wrap items-center gap-4 mb-3">
+                                {/* Size */}
+                                <div className="bg-gray-100 text-gray-800 text-sm font-bold px-2 py-1 rounded flex items-center gap-1 cursor-pointer">
+                                    Size: {item.size}
+                                </div>
+
+                                {/* Quantity Controls */}
+                                <div className='flex items-center gap-3 bg-gray-100 rounded px-2 py-1 w-fit'>
+                                    <span className="text-sm font-bold text-gray-800">Qty:</span>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                        onClick={() => UpdateQuantity(item._id, item.size, item.quantity - 1)}
+                                        className='text-gray-500 hover:text-gray-800 disabled:opacity-50'
+                                        disabled={item.quantity <= 1}
+                                        >
+                                        <FiMinus className="w-3 h-3" />
+                                        </button>
+                                        <span className='text-gray-800 font-bold text-sm'>
+                                        {item.quantity}
+                                        </span>
+                                        <button
+                                        onClick={() => UpdateQuantity(item._id, item.size, item.quantity + 1)}
+                                        className='text-gray-500 hover:text-gray-800'
+                                        >
+                                        <FiPlus className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className='flex items-baseline gap-2 mb-3'>
+                              <p className='text-gray-900 font-bold text-sm'>
+                                {currency}{productData.price * item.quantity}
+                              </p>
+                              <p className='text-gray-500 text-xs line-through'>
+                                {currency}{(productData.price * item.quantity * 1.3).toFixed(0)}
+                              </p>
+                              <p className='text-[#ff905a] text-xs font-bold'>
+                                30% OFF
+                              </p>
+                            </div>
+
+                            <p className="text-xs text-gray-500 flex items-center gap-1"><span className="text-green-600 font-bold">14 days</span> return available</p>
+                          </div>
+
+                          {/* Delete Button */}
+                          <button
+                            onClick={() => UpdateQuantity(item._id, item.size, 0)}
+                            className='absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors'
+                            title='Remove from cart'
+                          >
+                            <FaTimes className='w-4 h-4' />
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+              </div>
             </div>
 
             {/* Order Summary - Right Side */}
-            <div className='w-full lg:w-96 flex-shrink-0'>
-              <div className='bg-slate-900 border border-slate-800 rounded-lg p-6 lg:sticky lg:top-24'>
-                <h3 className='text-white text-xl font-bold mb-6'>Order Summary</h3>
+            <div className='w-full lg:w-[350px] flex-shrink-0'>
+              <div className='bg-white border border-gray-100 shadow-sm rounded p-4 lg:sticky lg:top-[100px]'>
                 
-                <div className='mb-6'>
+                <div className='mb-4'>
                   <CartTotal />
                 </div>
 
                 <button
                   onClick={() => {
-                    if (cartData. length > 0) {
+                    if (cartData.length > 0) {
                       navigate('/placeorder')
                     }
                   }}
                   disabled={cartData.length === 0}
-                  className='w-full px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all  cursor-pointer shadow-lg shadow-violet-500/30'
+                  className='w-full py-3 bg-[#ff3f6c] hover:bg-[#e8365d] text-white font-bold rounded shadow-[0_2px_4px_rgba(255,63,108,0.2)] uppercase tracking-wide transition-colors disabled:opacity-50'
                 >
-                  Proceed to Checkout
+                  PLACE ORDER
                 </button>
-
-                <button
-                  onClick={() => navigate('/collection')}
-                  className='w-full mt-3 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg transition-colors border border-slate-700'
-                >
-                  Continue Shopping
-                </button>
+                {/* Shared Cart Panel */}
+                <SharedCartPanel />
               </div>
             </div>
           </div>

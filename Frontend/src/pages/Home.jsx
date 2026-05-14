@@ -26,15 +26,13 @@ function Home() {
   }, []);
 
   return (
-    <div className="w-full min-h-screen bg-slate-950 overflow-x-hidden">
-      <Nav />
-
-      {/* HERO SECTION - Remove any gaps/borders */}
-      <section className="w-full h-screen pt-[70px] bg-slate-950">
-        <div className="w-full h-full flex flex-col md:flex-row">
+    <div className="w-full min-h-screen bg-white overflow-x-hidden">
+      {/* HERO SECTION */}
+      <section className="w-full h-auto md:h-[700px] bg-[#fbe7eb]">
+        <div className="w-full h-full flex flex-col-reverse md:flex-row max-w-[1600px] mx-auto">
 
           {/* LEFT - Hero Text */}
-          <div className="w-full md:w-1/2 h-1/2 md: h-full bg-gradient-to-br from-slate-900 to-slate-950">
+          <div className="w-full md:w-1/2 min-h-[400px] md:h-full bg-[#fbe7eb]">
             <Hero
               heroData={heroData[heroCount]}
               heroCount={heroCount}
@@ -43,24 +41,24 @@ function Home() {
           </div>
 
           {/* RIGHT - Background Image */}
-          <div className="w-full md:w-1/2 h-1/2 md:h-full">
+          <div className="w-full md:w-1/2 h-[400px] md:h-full">
             <Background heroCount={heroCount} />
           </div>
           
         </div>
       </section>
 
-      {/* PRODUCTS SECTION - Remove top margin/border */}
-      <section className="w-full bg-slate-950">
+      {/* PRODUCTS SECTION */}
+      <section className="w-full bg-white max-w-[1600px] mx-auto pt-16">
         <Product />
       </section>
 
       {/* OTHER SECTIONS */}
-      <section className="w-full bg-slate-950">
+      <section className="w-full bg-white max-w-[1600px] mx-auto">
         <OurPolicy />
       </section>
 
-      <section className="w-full bg-slate-950">
+      <section className="w-full bg-white max-w-[1600px] mx-auto">
         <NewLetterBox />
       </section>
 
