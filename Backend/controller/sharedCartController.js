@@ -72,7 +72,12 @@ export const joinSharedCart = async (req, res) => {
         const user = await User.findById(req.userId).select("name email");
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        const cart = await SharedCart.findOne({ cartCode });
+        const cart = await SharedCart.findOne({
+            $or: [
+                { cartCode },
+                ...(cartCode?.match(/^[0-9a-fA-F]{24}$/) ? [{ _id: cartCode }] : []),
+            ],
+        });
         if (!cart) return res.status(404).json({ message: "Invalid invite code" });
 
         // Already a participant?

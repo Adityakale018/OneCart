@@ -6,7 +6,7 @@ import { userDatacontext } from "../context/UserContext";
 import { useSharedCart } from "../hooks/useSharedCart";
 import {
     FiUsers, FiLock, FiUnlock, FiSend, FiTrash2, FiPlus, FiMinus,
-    FiShare2, FiCopy, FiCheckCircle, FiXCircle, FiShoppingBag,
+    FiCopy, FiCheckCircle, FiXCircle, FiShoppingBag,
 } from "react-icons/fi";
 import { FaThumbsUp, FaThumbsDown, FaCrown } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -52,12 +52,26 @@ function SharedCart() {
     const { userData } = useContext(userDatacontext);
     const { products, currency } = useContext(shopDataContext);
 
+    // ── Auto-join: when navigating via invite link (cartCode or _id),
+    //    attempt to join the cart first, then the hook will load it.
+    const [joinAttempted, setJoinAttempted] = useState(false);
+    useEffect(() => {
+        if (!userData || !serverUrl || !cartId) return;
+        // Always attempt join — backend returns 200 if already a participant
+        axios
+            .post(`${serverUrl}/api/sharedcart/join`, { cartCode: cartId }, { withCredentials: true })
+            .catch(() => {
+                // If join fails (e.g. invalid code), the hook's fetchCart will surface the error
+            })
+            .finally(() => setJoinAttempted(true));
+    }, [cartId, serverUrl, userData]);
+
     const {
         cart, onlineUserIds, chatMessages, typingUsers,
         loading, error,
         addItem, removeItem, updateQuantity, voteItem,
         sendMessage, sendTyping, toggleLock, removeParticipant,
-    } = useSharedCart(cartId, serverUrl, userData);
+    } = useSharedCart(joinAttempted ? cartId : null, serverUrl, userData);
 
     const [chatInput, setChatInput] = useState("");
     const [copied, setCopied] = useState(false);
@@ -71,6 +85,7 @@ function SharedCart() {
     }, [chatMessages]);
 
     const isOwner = cart?.owner?.toString() === userData?._id?.toString();
+    // Always share cartCode (the short code) not the MongoDB _id
     const inviteUrl = `${window.location.origin}/shared-cart/${cart?.cartCode || cartId}`;
 
     const copyInvite = () => {

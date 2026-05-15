@@ -65,8 +65,8 @@ function Cart() {
                      Available Offers
                   </h4>
                   <ul className="text-gray-600 text-xs list-disc pl-4 space-y-1 mt-2">
-                      <li>10% Instant Discount on SBI Credit Cards on a min spend of $3,000.</li>
-                      <li>Flat $200 Cashback on first order.</li>
+                      <li>10% Instant Discount on SBI Credit Cards on a min spend of {currency}3,000.</li>
+                      <li>Flat {currency}200 Cashback on first order.</li>
                   </ul>
               </div>
 

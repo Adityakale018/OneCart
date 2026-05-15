@@ -53,9 +53,22 @@ function SplitCheckout() {
     const [loading, setLoading] = useState(true);
     const [payingId, setPayingId] = useState(null);
     const [error, setError] = useState("");
+    const [razorpayReady, setRazorpayReady] = useState(false);
 
     /* Participant share amounts (local state for step 2) */
     const [assignments, setAssignments] = useState([]);
+
+    // Load Razorpay SDK dynamically
+    useEffect(() => {
+        if (window.Razorpay) { setRazorpayReady(true); return; }
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        script.onload = () => setRazorpayReady(true);
+        script.onerror = () => setError("Failed to load payment gateway");
+        document.head.appendChild(script);
+        return () => { /* script stays for session */ };
+    }, []);
 
     // Fetch shared cart
     useEffect(() => {
@@ -141,6 +154,10 @@ function SplitCheckout() {
 
     // Load Razorpay and pay for one participant
     const handlePay = async (splitEntryId, entryAmount) => {
+        if (!razorpayReady) {
+            setError("Payment gateway is still loading. Please wait a moment.");
+            return;
+        }
         try {
             setPayingId(splitEntryId);
             const orderRes = await axios.post(
@@ -396,9 +413,6 @@ function SplitCheckout() {
                     </div>
                 )}
             </div>
-
-            {/* Load Razorpay SDK */}
-            <script src="https://checkout.razorpay.com/v1/checkout.js" />
         </div>
     );
 }

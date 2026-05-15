@@ -119,16 +119,21 @@ function Order() {
               >
                 {/* Order top bar */}
                 <div className="bg-gray-50 border-b border-gray-100 px-5 py-3 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <FiCalendar className="w-3.5 h-3.5" />
-                      {new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FiCreditCard className="w-3.5 h-3.5" />
-                      {item.paymentMethod?.toUpperCase()}
-                    </span>
-                    <span className="text-gray-400">#{item.orderId?.slice(-8).toUpperCase()}</span>
+                  <div className="flex flex-col gap-1 text-xs text-gray-500">
+                    <div className="flex items-center gap-4">
+                      <span className="flex items-center gap-1">
+                        <FiCalendar className="w-3.5 h-3.5" />
+                        Ordered: {new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <FiCreditCard className="w-3.5 h-3.5" />
+                        {item.paymentMethod?.toUpperCase()}
+                      </span>
+                      <span className="text-gray-400">#{item.orderId?.slice(-8).toUpperCase()}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-600">
+                      <span className="font-semibold">Expected Delivery:</span> {new Date(new Date(item.date).setDate(new Date(item.date).getDate() + 7)).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </div>
                   </div>
                   <StatusPill status={item.status} />
                 </div>

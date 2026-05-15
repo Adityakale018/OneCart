@@ -61,25 +61,36 @@ INSTRUCTIONS:
 - You remember the conversation history provided.`;
 
         // ── 4. Call Gemini ────────────────────────────────────────────────────
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash",
+            systemInstruction: systemPrompt,
+        });
 
         // Build chat history for Gemini (last 10 messages)
         const history = conversationHistory.slice(-10).map((m) => ({
             role: m.role === "user" ? "user" : "model",
             parts: [{ text: m.content }],
         }));
-        
+
         // Gemini strictly requires the first message in history to be from 'user'
         while (history.length > 0 && history[0].role !== "user") {
             history.shift();
         }
 
+        // Gemini also requires history to alternate user/model, strip consecutive same roles
+        const cleanHistory = [];
+        for (const msg of history) {
+            if (cleanHistory.length === 0 || cleanHistory[cleanHistory.length - 1].role !== msg.role) {
+                cleanHistory.push(msg);
+            }
+        }
+
         const chat = model.startChat({
-            history,
+            history: cleanHistory,
             generationConfig: { maxOutputTokens: 1000, temperature: 0.7 },
         });
 
-        const result = await chat.sendMessage(`${systemPrompt}\n\nUser: ${message}`);
+        const result = await chat.sendMessage(message);
         const rawResponse = result.response.text();
 
         // ── 5. Parse product recommendations from response ────────────────────
