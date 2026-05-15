@@ -44,6 +44,17 @@ export const getSplitPayment = async (req, res) => {
     }
 };
 
+// ─── GET /api/splitpayment/bycart/:cartId ────────────────────────────────────
+export const getSplitPaymentByCart = async (req, res) => {
+    try {
+        const doc = await SplitPayment.findOne({ sharedCartId: req.params.cartId }).sort({ createdAt: -1 });
+        if (!doc) return res.status(404).json({ message: "No split payment found for this cart" });
+        return res.status(200).json({ success: true, splitPayment: doc });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 // ─── POST /api/splitpayment/:splitId/pay ─────────────────────────────────────
 // Creates a Razorpay order for a specific participant
 export const initiateParticipantPayment = async (req, res) => {

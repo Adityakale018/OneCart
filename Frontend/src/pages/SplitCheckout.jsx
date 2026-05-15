@@ -58,6 +58,9 @@ function SplitCheckout() {
     /* Participant share amounts (local state for step 2) */
     const [assignments, setAssignments] = useState([]);
 
+    // Derived: is the logged-in user the owner of this cart?
+    const isOwner = cart?.owner?.toString() === userData?._id?.toString();
+
     // Load Razorpay SDK dynamically
     useEffect(() => {
         if (window.Razorpay) { setRazorpayReady(true); return; }
@@ -67,21 +70,38 @@ function SplitCheckout() {
         script.onload = () => setRazorpayReady(true);
         script.onerror = () => setError("Failed to load payment gateway");
         document.head.appendChild(script);
-        return () => { /* script stays for session */ };
     }, []);
 
-    // Fetch shared cart
+    // Fetch shared cart AND check for an existing split payment doc
     useEffect(() => {
         if (!cartId) return;
-        axios.get(`${serverUrl}/api/sharedcart/${cartId}`, { withCredentials: true })
-            .then((res) => {
-                setCart(res.data.cart);
-                setLoading(false);
-            })
-            .catch(() => {
+        const fetchAll = async () => {
+            try {
+                // 1. Load the shared cart
+                const cartRes = await axios.get(`${serverUrl}/api/sharedcart/${cartId}`, { withCredentials: true });
+                const loadedCart = cartRes.data.cart;
+                setCart(loadedCart);
+
+                // 2. Check if a split payment already exists for this cart
+                try {
+                    const splitRes = await axios.get(
+                        `${serverUrl}/api/splitpayment/bycart/${loadedCart._id}`,
+                        { withCredentials: true }
+                    );
+                    if (splitRes.data?.splitPayment) {
+                        setSplitDoc(splitRes.data.splitPayment);
+                        setStep(3); // Jump straight to Pay screen for everyone
+                    }
+                } catch {
+                    // No existing split yet — owner will create one
+                }
+            } catch {
                 setError("Failed to load cart");
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+        fetchAll();
     }, [cartId, serverUrl]);
 
     // Compute total from cart items
@@ -90,7 +110,7 @@ function SplitCheckout() {
         return sum + (prod?.price || 0) * item.quantity;
     }, 0) || 0;
 
-    // Build initial assignments when cart or mode changes
+    // Build initial assignments when cart loads
     useEffect(() => {
         if (!cart) return;
         const participants = cart.participants || [];
@@ -125,7 +145,6 @@ function SplitCheckout() {
         setAssignments((prev) => {
             const updated = [...prev];
             updated[idx] = { ...updated[idx], [field]: value };
-            // If percentage mode: recompute amount
             if (field === "percentage" && splitMode === "percentage") {
                 updated[idx].amount = +((totalAmount * value) / 100).toFixed(2);
             }
@@ -133,7 +152,7 @@ function SplitCheckout() {
         });
     };
 
-    // Create split payment document
+    // Create split payment document (owner only)
     const handleCreateSplit = async () => {
         try {
             setError("");
@@ -152,7 +171,7 @@ function SplitCheckout() {
         }
     };
 
-    // Load Razorpay and pay for one participant
+    // Initiate payment via Razorpay for the current user's share
     const handlePay = async (splitEntryId, entryAmount) => {
         if (!razorpayReady) {
             setError("Payment gateway is still loading. Please wait a moment.");
@@ -226,14 +245,20 @@ function SplitCheckout() {
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-3xl mx-auto px-4 py-4">
                     <h1 className="text-xl font-bold text-gray-900 mb-4">Split Payment Checkout</h1>
-                    {/* Stepper */}
-                    <div className="flex items-center gap-2">
-                        <Step num={1} label="Mode" active={step === 1} done={step > 1} />
-                        <StepDivider done={step > 1} />
-                        <Step num={2} label="Assign" active={step === 2} done={step > 2} />
-                        <StepDivider done={step > 2} />
-                        <Step num={3} label="Pay" active={step === 3} done={splitDoc?.allPaid} />
-                    </div>
+                    {/* Stepper — only show all steps for owner, participants see just Pay */}
+                    {isOwner ? (
+                        <div className="flex items-center gap-2">
+                            <Step num={1} label="Mode" active={step === 1} done={step > 1} />
+                            <StepDivider done={step > 1} />
+                            <Step num={2} label="Assign" active={step === 2} done={step > 2} />
+                            <StepDivider done={step > 2} />
+                            <Step num={3} label="Pay" active={step === 3} done={splitDoc?.allPaid} />
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <Step num={1} label="Pay" active={step === 3} done={splitDoc?.allPaid} />
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -244,8 +269,17 @@ function SplitCheckout() {
                     </div>
                 )}
 
-                {/* ── Step 1: Choose Mode ─────────────────────────────────── */}
-                {step === 1 && (
+                {/* ── Non-owner waiting state (split not yet created) ──────── */}
+                {!isOwner && step < 3 && (
+                    <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
+                        <div className="w-14 h-14 border-4 border-[#ff3f6c]/30 border-t-[#ff3f6c] rounded-full animate-spin mx-auto mb-4" />
+                        <h2 className="font-bold text-gray-900 mb-2">Waiting for the cart owner…</h2>
+                        <p className="text-sm text-gray-500">The cart owner is setting up the split. You'll see your payment amount once they confirm.</p>
+                    </div>
+                )}
+
+                {/* ── Step 1: Choose Mode (owner only) ────────────────────── */}
+                {isOwner && step === 1 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-6">
                         <h2 className="font-bold text-gray-900 mb-1">Choose Split Mode</h2>
                         <p className="text-sm text-gray-500 mb-5">
@@ -278,8 +312,8 @@ function SplitCheckout() {
                     </div>
                 )}
 
-                {/* ── Step 2: Assign Amounts ──────────────────────────────── */}
-                {step === 2 && (
+                {/* ── Step 2: Assign Amounts (owner only) ─────────────────── */}
+                {isOwner && step === 2 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-6">
                         <h2 className="font-bold text-gray-900 mb-1">Assign Shares</h2>
                         <p className="text-sm text-gray-500 mb-5">
@@ -298,7 +332,6 @@ function SplitCheckout() {
                                             <p className="text-xs text-gray-400">You</p>
                                         )}
                                     </div>
-                                    {/* Amount input based on mode */}
                                     {splitMode === "equal" ? (
                                         <span className="font-bold text-gray-900">{currency}{a.amount}</span>
                                     ) : splitMode === "percentage" ? (
@@ -330,7 +363,6 @@ function SplitCheckout() {
                             ))}
                         </div>
 
-                        {/* Total check */}
                         <div className="mt-4 flex justify-between items-center text-sm border-t border-gray-100 pt-4">
                             <span className="text-gray-500">Assigned total</span>
                             <span className={`font-bold ${Math.abs(assignments.reduce((s, a) => s + a.amount, 0) - totalAmount) < 1 ? "text-emerald-600" : "text-red-500"}`}>
@@ -358,7 +390,7 @@ function SplitCheckout() {
                     </div>
                 )}
 
-                {/* ── Step 3: Pay ─────────────────────────────────────────── */}
+                {/* ── Step 3: Pay (all participants) ──────────────────────── */}
                 {step === 3 && splitDoc && (
                     <div className="space-y-4">
                         {splitDoc.allPaid && (
@@ -389,7 +421,7 @@ function SplitCheckout() {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-gray-900 text-sm">
-                                                    {split.name} {isMe && <span className="text-gray-400">(you)</span>}
+                                                    {split.name} {isMe && <span className="text-gray-400 font-normal">(you)</span>}
                                                 </p>
                                                 <p className="text-xs text-gray-500">{currency}{split.amount.toFixed(2)}</p>
                                             </div>
@@ -397,7 +429,7 @@ function SplitCheckout() {
                                             {isMe && split.status === "pending" && (
                                                 <button
                                                     onClick={() => handlePay(split._id, split.amount)}
-                                                    disabled={payingId === split._id}
+                                                    disabled={payingId === split._id || !razorpayReady}
                                                     className="ml-2 bg-[#ff3f6c] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#e8365d] transition-colors disabled:opacity-60"
                                                 >
                                                     {payingId === split._id ? (

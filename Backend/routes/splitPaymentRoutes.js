@@ -3,6 +3,7 @@ import isAuth from "../middleware/isAuth.js";
 import {
     createSplitPayment,
     getSplitPayment,
+    getSplitPaymentByCart,
     initiateParticipantPayment,
     verifyParticipantPayment,
     sendReminder,
@@ -11,6 +12,7 @@ import {
 const router = express.Router();
 
 router.post("/create", isAuth, createSplitPayment);
+router.get("/bycart/:cartId", isAuth, getSplitPaymentByCart);
 router.get("/:splitId", isAuth, getSplitPayment);
 router.post("/:splitId/pay", isAuth, initiateParticipantPayment);
 router.post("/verify", isAuth, verifyParticipantPayment);
