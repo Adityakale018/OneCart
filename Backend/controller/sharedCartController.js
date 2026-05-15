@@ -125,6 +125,11 @@ export const addItem = async (req, res) => {
         }
         await cart.save();
 
+        const io = req.app.get("io");
+        if (io) {
+            io.to(req.params.cartId).emit("cart-updated", { items: cart.items, action: "add", actorName: user.name });
+        }
+
         return res.status(200).json({ success: true, items: cart.items });
     } catch (error) {
         return res.status(error.status || 500).json({ message: error.message });
@@ -148,6 +153,12 @@ export const updateItem = async (req, res) => {
         }
         await cart.save();
 
+        const user = await User.findById(req.userId).select("name");
+        const io = req.app.get("io");
+        if (io) {
+            io.to(req.params.cartId).emit("cart-updated", { items: cart.items, action: "update", actorName: user.name });
+        }
+
         return res.status(200).json({ success: true, items: cart.items });
     } catch (error) {
         return res.status(error.status || 500).json({ message: error.message });
@@ -160,10 +171,17 @@ export const removeItem = async (req, res) => {
         const cart = await getCartAndVerify(req.params.cartId, req.userId);
         if (cart.isLocked) return res.status(403).json({ message: "Cart is locked" });
 
-        cart.items = cart.items.filter(
-            (i) => i._id.toString() !== req.params.itemId
-        );
+        const item = cart.items.id(req.params.itemId);
+        if (!item) return res.status(404).json({ message: "Item not found" });
+
+        item.deleteOne();
         await cart.save();
+
+        const user = await User.findById(req.userId).select("name");
+        const io = req.app.get("io");
+        if (io) {
+            io.to(req.params.cartId).emit("cart-updated", { items: cart.items, action: "remove", actorName: user.name });
+        }
 
         return res.status(200).json({ success: true, items: cart.items });
     } catch (error) {

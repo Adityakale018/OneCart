@@ -57,6 +57,8 @@ const io = new Server(httpServer, {
     },
 });
 
+app.set("io", io);
+
 // Authenticate socket connections via JWT cookie
 io.use((socket, next) => {
     try {
@@ -98,10 +100,7 @@ io.on("connection", (socket) => {
     });
 
     // ── Real-time cart update (add/remove/quantity change) ────────────────────
-    socket.on("cart-update", ({ cartId, items, action, actorName }) => {
-        // Broadcast to everyone ELSE in the room
-        socket.to(cartId).emit("cart-updated", { items, action, actorName });
-    });
+    // Handled natively by controllers now.
 
     // ── Chat message ──────────────────────────────────────────────────────────
     socket.on("chat-message", ({ cartId, message, name, timestamp }) => {
