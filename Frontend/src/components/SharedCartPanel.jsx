@@ -39,13 +39,21 @@ function SharedCartPanel() {
 
     const handleJoinSharedCart = async (e) => {
         e.preventDefault();
-        if (!joinCode.trim()) return;
+        let code = joinCode.trim();
+        if (!code) return;
+
+        // If user pastes the full URL, extract the code
+        if (code.includes("/shared-cart/")) {
+            const parts = code.split("/");
+            code = parts[parts.length - 1];
+        }
+
         try {
             setLoading(true);
             setError("");
             const res = await axios.post(
                 `${serverUrl}/api/sharedcart/join`,
-                { cartCode: joinCode.trim() },
+                { cartCode: code },
                 { withCredentials: true }
             );
             navigate(`/shared-cart/${res.data.cart._id}`);
