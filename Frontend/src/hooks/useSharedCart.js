@@ -129,44 +129,41 @@ export function useSharedCart(cartId, serverUrl, userData) {
 
     const addItem = useCallback(async (productId, size, quantity = 1) => {
         try {
-            const res = await axios.post(
+            await axios.post(
                 `${serverUrl}/api/sharedcart/${cartId}/item`,
                 { productId, size, quantity },
                 { withCredentials: true }
             );
-            setCart((prev) => prev ? { ...prev, items: res.data.items } : prev);
-            emitCartUpdate(res.data.items, "add");
+            // Backend broadcasts cart-updated via socket to all room members (incl. sender)
         } catch (err) {
             console.error("addItem error:", err);
         }
-    }, [cartId, serverUrl, emitCartUpdate]);
+    }, [cartId, serverUrl]);
 
     const removeItem = useCallback(async (itemId) => {
         try {
-            const res = await axios.delete(
+            await axios.delete(
                 `${serverUrl}/api/sharedcart/${cartId}/item/${itemId}`,
                 { withCredentials: true }
             );
-            setCart((prev) => prev ? { ...prev, items: res.data.items } : prev);
-            emitCartUpdate(res.data.items, "remove");
+            // Backend broadcasts cart-updated via socket to all room members (incl. sender)
         } catch (err) {
             console.error("removeItem error:", err);
         }
-    }, [cartId, serverUrl, emitCartUpdate]);
+    }, [cartId, serverUrl]);
 
     const updateQuantity = useCallback(async (itemId, quantity) => {
         try {
-            const res = await axios.put(
+            await axios.put(
                 `${serverUrl}/api/sharedcart/${cartId}/item`,
                 { itemId, quantity },
                 { withCredentials: true }
             );
-            setCart((prev) => prev ? { ...prev, items: res.data.items } : prev);
-            emitCartUpdate(res.data.items, "update");
+            // Backend broadcasts cart-updated via socket to all room members (incl. sender)
         } catch (err) {
             console.error("updateQuantity error:", err);
         }
-    }, [cartId, serverUrl, emitCartUpdate]);
+    }, [cartId, serverUrl]);
 
     const voteItem = useCallback(async (itemId, vote) => {
         try {

@@ -176,28 +176,29 @@ function SharedCart() {
                             {copied ? "Copied!" : "Invite"}
                         </button>
 
-                        {/* Owner controls */}
+                        {/* Owner-only: Lock toggle */}
                         {isOwner && (
-                            <>
-                                <button
-                                    onClick={toggleLock}
-                                    className={`flex items-center gap-2 text-sm font-semibold rounded-lg px-3 py-1.5 transition-colors ${cart?.isLocked
-                                        ? "bg-amber-50 text-amber-600 border border-amber-300 hover:bg-amber-100"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                    }`}
-                                >
-                                    {cart?.isLocked ? <FiUnlock className="w-4 h-4" /> : <FiLock className="w-4 h-4" />}
-                                    {cart?.isLocked ? "Unlock" : "Lock"}
-                                </button>
+                            <button
+                                onClick={toggleLock}
+                                className={`flex items-center gap-2 text-sm font-semibold rounded-lg px-3 py-1.5 transition-colors ${cart?.isLocked
+                                    ? "bg-amber-50 text-amber-600 border border-amber-300 hover:bg-amber-100"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                }`}
+                            >
+                                {cart?.isLocked ? <FiUnlock className="w-4 h-4" /> : <FiLock className="w-4 h-4" />}
+                                {cart?.isLocked ? "Unlock" : "Lock"}
+                            </button>
+                        )}
 
-                                <button
-                                    onClick={() => navigate(`/split-checkout/${cartId}`)}
-                                    className="bg-[#ff3f6c] text-white text-sm font-semibold rounded-lg px-4 py-1.5 hover:bg-[#e8365d] transition-colors flex items-center gap-2"
-                                >
-                                    <FiShoppingBag className="w-4 h-4" />
-                                    Split & Pay
-                                </button>
-                            </>
+                        {/* All participants see Split & Pay */}
+                        {cart && cart.participants?.length >= 1 && (
+                            <button
+                                onClick={() => navigate(`/split-checkout/${cartId}`)}
+                                className="bg-[#ff3f6c] text-white text-sm font-semibold rounded-lg px-4 py-1.5 hover:bg-[#e8365d] transition-colors flex items-center gap-2"
+                            >
+                                <FiShoppingBag className="w-4 h-4" />
+                                Split &amp; Pay
+                            </button>
                         )}
                     </div>
                 </div>
