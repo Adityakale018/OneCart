@@ -32,6 +32,8 @@ const splitPaymentSchema = new mongoose.Schema({
         ref: "Order",
     },
     totalAmount: { type: Number, required: true },
+    address: { type: Object, required: true }, // Delivery address for the order
+    items: { type: Array, required: true },    // Items being purchased
     splitMode: {
         type: String,
         enum: ["equal", "percentage", "custom", "item-based"],

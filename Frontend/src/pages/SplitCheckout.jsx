@@ -6,7 +6,7 @@ import { shopDataContext } from "../context/ShopContext";
 import axios from "axios";
 import {
     FiUsers, FiCheckCircle, FiClock, FiAlertCircle,
-    FiDollarSign, FiPercent, FiList, FiBox,
+    FiDollarSign, FiPercent, FiList, FiBox, FiTruck, FiChevronRight
 } from "react-icons/fi";
 
 /* ─── Step Indicator ──────────────────────────────────────────────── */
@@ -21,6 +21,19 @@ const Step = ({ num, label, active, done }) => (
 
 const StepDivider = ({ done }) => (
     <div className={`flex-1 h-px mt-4 transition-colors ${done ? "bg-emerald-400" : "bg-gray-200"}`} />
+);
+
+/* ─── Input Field ─────────────────────────────────────────────────── */
+const Field = ({ label, ...props }) => (
+    <div>
+        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+            {label}
+        </label>
+        <input
+            {...props}
+            className="w-full h-10 bg-gray-50 border border-gray-200 rounded-lg px-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#ff3f6c] focus:ring-1 focus:ring-[#ff3f6c]/10 transition-all"
+        />
+    </div>
 );
 
 /* ─── Payment Status Badge ────────────────────────────────────────── */
@@ -54,6 +67,14 @@ function SplitCheckout() {
     const [payingId, setPayingId] = useState(null);
     const [error, setError] = useState("");
     const [razorpayReady, setRazorpayReady] = useState(false);
+
+    /* Delivery info state (owner only) */
+    const [formData, setFormData] = useState({
+        firstName: '', lastName: '', email: '',
+        street: '', city: '', state: '', pincode: '', country: '', phone: ''
+    });
+
+    const onAddressChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     /* Participant share amounts (local state for step 2) */
     const [assignments, setAssignments] = useState([]);
@@ -154,12 +175,35 @@ function SplitCheckout() {
 
     // Create split payment document (owner only)
     const handleCreateSplit = async () => {
+        // Validate address
+        const required = ['firstName', 'lastName', 'email', 'street', 'city', 'state', 'pincode', 'phone'];
+        for (let field of required) {
+            if (!formData[field]) {
+                setError(`Please fill in ${field} for delivery address`);
+                return;
+            }
+        }
+
         try {
             setError("");
             setLoading(true);
+
+            // Enrich items with full product data for the order
+            const enrichedItems = cart.items.map(item => {
+                const prod = products.find(p => p._id === item.productId);
+                return { ...prod, size: item.size, quantity: item.quantity };
+            });
+
             const res = await axios.post(
                 `${serverUrl}/api/splitpayment/create`,
-                { sharedCartId: cart._id, totalAmount, splitMode, splits: assignments },
+                { 
+                    sharedCartId: cart._id, 
+                    totalAmount, 
+                    splitMode, 
+                    splits: assignments,
+                    address: formData,
+                    items: enrichedItems
+                },
                 { withCredentials: true }
             );
             setSplitDoc(res.data.splitPayment);
@@ -312,79 +356,107 @@ function SplitCheckout() {
                     </div>
                 )}
 
-                {/* ── Step 2: Assign Amounts (owner only) ─────────────────── */}
+                {/* ── Step 2: Assign Amounts + Address (owner only) ────────── */}
                 {isOwner && step === 2 && (
-                    <div className="bg-white rounded-xl border border-gray-200 p-6">
-                        <h2 className="font-bold text-gray-900 mb-1">Assign Shares</h2>
-                        <p className="text-sm text-gray-500 mb-5">
-                            Total: <span className="font-bold text-gray-900">{currency}{totalAmount}</span>
-                        </p>
+                    <div className="space-y-6">
+                        {/* Shares assignment */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h2 className="font-bold text-gray-900 mb-1">Assign Shares</h2>
+                            <p className="text-sm text-gray-500 mb-5">
+                                Total: <span className="font-bold text-gray-900">{currency}{totalAmount}</span>
+                            </p>
 
-                        <div className="space-y-3">
-                            {assignments.map((a, idx) => (
-                                <div key={a.userId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                    <div className="w-9 h-9 rounded-full bg-[#ff3f6c] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-                                        {a.name?.slice(0, 1).toUpperCase()}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-semibold text-gray-900 text-sm">{a.name}</p>
-                                        {a.userId?.toString() === userData?._id?.toString() && (
-                                            <p className="text-xs text-gray-400">You</p>
+                            <div className="space-y-3">
+                                {assignments.map((a, idx) => (
+                                    <div key={a.userId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                        <div className="w-9 h-9 rounded-full bg-[#ff3f6c] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                            {a.name?.slice(0, 1).toUpperCase()}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-semibold text-gray-900 text-sm">{a.name}</p>
+                                            {a.userId?.toString() === userData?._id?.toString() && (
+                                                <p className="text-xs text-gray-400">You</p>
+                                            )}
+                                        </div>
+                                        {splitMode === "equal" ? (
+                                            <span className="font-bold text-gray-900">{currency}{a.amount}</span>
+                                        ) : splitMode === "percentage" ? (
+                                            <div className="flex items-center gap-1">
+                                                <input
+                                                    type="number"
+                                                    min={0}
+                                                    max={100}
+                                                    value={a.percentage}
+                                                    onChange={(e) => updateAssignment(idx, "percentage", +e.target.value)}
+                                                    className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-center focus:outline-none focus:border-[#ff3f6c]"
+                                                />
+                                                <span className="text-gray-500 text-sm">%</span>
+                                                <span className="text-gray-700 text-sm ml-1">= {currency}{a.amount}</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-1">
+                                                <span className="text-gray-600 text-sm">{currency}</span>
+                                                <input
+                                                    type="number"
+                                                    min={0}
+                                                    value={a.amount}
+                                                    onChange={(e) => updateAssignment(idx, "amount", +e.target.value)}
+                                                    className="w-24 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#ff3f6c]"
+                                                />
+                                            </div>
                                         )}
                                     </div>
-                                    {splitMode === "equal" ? (
-                                        <span className="font-bold text-gray-900">{currency}{a.amount}</span>
-                                    ) : splitMode === "percentage" ? (
-                                        <div className="flex items-center gap-1">
-                                            <input
-                                                type="number"
-                                                min={0}
-                                                max={100}
-                                                value={a.percentage}
-                                                onChange={(e) => updateAssignment(idx, "percentage", +e.target.value)}
-                                                className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-center focus:outline-none focus:border-[#ff3f6c]"
-                                            />
-                                            <span className="text-gray-500 text-sm">%</span>
-                                            <span className="text-gray-700 text-sm ml-1">= {currency}{a.amount}</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-gray-600 text-sm">{currency}</span>
-                                            <input
-                                                type="number"
-                                                min={0}
-                                                value={a.amount}
-                                                onChange={(e) => updateAssignment(idx, "amount", +e.target.value)}
-                                                className="w-24 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-[#ff3f6c]"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+
+                            <div className="mt-4 flex justify-between items-center text-sm border-t border-gray-100 pt-4">
+                                <span className="text-gray-500">Assigned total</span>
+                                <span className={`font-bold ${Math.abs(assignments.reduce((s, a) => s + a.amount, 0) - totalAmount) < 1 ? "text-emerald-600" : "text-red-500"}`}>
+                                    {currency}{assignments.reduce((s, a) => s + a.amount, 0).toFixed(2)}
+                                </span>
+                            </div>
                         </div>
 
-                        <div className="mt-4 flex justify-between items-center text-sm border-t border-gray-100 pt-4">
-                            <span className="text-gray-500">Assigned total</span>
-                            <span className={`font-bold ${Math.abs(assignments.reduce((s, a) => s + a.amount, 0) - totalAmount) < 1 ? "text-emerald-600" : "text-red-500"}`}>
-                                {currency}{assignments.reduce((s, a) => s + a.amount, 0).toFixed(2)}
-                            </span>
+                        {/* Delivery address */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h2 className="font-bold text-gray-900 text-base mb-5 flex items-center gap-2">
+                                <FiTruck className="w-5 h-5 text-[#ff3f6c]" />
+                                Delivery Information
+                            </h2>
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Field label="First Name" type="text" name="firstName" value={formData.firstName} onChange={onAddressChange} required placeholder="Rahul" />
+                                    <Field label="Last Name"  type="text" name="lastName"  value={formData.lastName}  onChange={onAddressChange} required placeholder="Sharma" />
+                                </div>
+                                <Field label="Email Address" type="email" name="email" value={formData.email} onChange={onAddressChange} required placeholder="rahul@example.com" />
+                                <Field label="Street Address" type="text" name="street" value={formData.street} onChange={onAddressChange} required placeholder="123, MG Road" />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Field label="City"  type="text" name="city"  value={formData.city}  onChange={onAddressChange} required placeholder="Mumbai" />
+                                    <Field label="State" type="text" name="state" value={formData.state} onChange={onAddressChange} required placeholder="Maharashtra" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Field label="Pincode" type="text" name="pincode" value={formData.pincode} onChange={onAddressChange} required placeholder="400001" />
+                                    <Field label="Country" type="text" name="country" value={formData.country} onChange={onAddressChange} required placeholder="India" />
+                                </div>
+                                <Field label="Phone Number" type="tel" name="phone" value={formData.phone} onChange={onAddressChange} required placeholder="+91 98765 43210" />
+                            </div>
                         </div>
 
                         <div className="flex gap-3 mt-5">
                             <button
                                 onClick={() => setStep(1)}
-                                className="flex-1 h-11 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                                className="flex-1 h-12 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                             >
                                 ← Back
                             </button>
                             <button
                                 onClick={handleCreateSplit}
                                 disabled={loading}
-                                className="flex-1 h-11 bg-[#ff3f6c] text-white font-semibold rounded-lg hover:bg-[#e8365d] transition-colors disabled:opacity-60"
+                                className="flex-2 h-12 bg-[#ff3f6c] text-white font-bold rounded-lg hover:bg-[#e8365d] transition-colors disabled:opacity-60 shadow-lg shadow-[#ff3f6c]/20"
                             >
                                 {loading ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
-                                ) : "Confirm & Proceed →"}
+                                ) : "CONFIRM & INITIATE SPLIT →"}
                             </button>
                         </div>
                     </div>
@@ -394,43 +466,58 @@ function SplitCheckout() {
                 {step === 3 && splitDoc && (
                     <div className="space-y-4">
                         {splitDoc.allPaid && (
-                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3">
-                                <FiCheckCircle className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-                                <div>
-                                    <p className="font-bold text-emerald-800">All payments completed! 🎉</p>
-                                    <p className="text-sm text-emerald-600">Your order is being processed.</p>
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 flex items-center gap-4">
+                                <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                    <FiCheckCircle className="w-7 h-7" />
+                                </div>
+                                <div className="ml-4">
+                                    <p className="font-bold text-emerald-800 text-lg">Order Placed Successfully! 🎉</p>
+                                    <p className="text-sm text-emerald-600">All payments are in. Everyone can now view this order in their history.</p>
+                                    <button 
+                                        onClick={() => navigate('/order')}
+                                        className="mt-3 text-xs font-bold text-emerald-700 underline underline-offset-2"
+                                    >
+                                        Go to My Orders
+                                    </button>
                                 </div>
                             </div>
                         )}
 
-                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                            <div className="px-5 py-4 border-b border-gray-100">
-                                <h2 className="font-bold text-gray-900">Payment Status</h2>
-                                <p className="text-sm text-gray-500 mt-0.5">
-                                    Total: <span className="font-bold">{currency}{splitDoc.totalAmount}</span>
-                                </p>
+                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                                <div>
+                                    <h2 className="font-bold text-gray-900">Payment Status</h2>
+                                    <p className="text-xs text-gray-500 mt-0.5">
+                                        Total Amount: <span className="font-bold text-gray-900">{currency}{splitDoc.totalAmount}</span>
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Cart ID</span>
+                                    <span className="text-xs font-mono text-gray-500">#{cartId}</span>
+                                </div>
                             </div>
 
                             <div className="divide-y divide-gray-100">
                                 {splitDoc.splits.map((split) => {
                                     const isMe = split.userId?.toString() === userData?._id?.toString();
                                     return (
-                                        <div key={split._id} className="px-5 py-4 flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-full bg-[#ff3f6c]/10 text-[#ff3f6c] flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                        <div key={split._id} className="px-5 py-5 flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-full bg-[#ff3f6c]/10 text-[#ff3f6c] flex items-center justify-center font-bold text-sm flex-shrink-0 border border-[#ff3f6c]/20">
                                                 {split.name?.slice(0, 1).toUpperCase()}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-semibold text-gray-900 text-sm">
-                                                    {split.name} {isMe && <span className="text-gray-400 font-normal">(you)</span>}
+                                                <p className="font-bold text-gray-900 text-sm flex items-center gap-1.5">
+                                                    {split.name} 
+                                                    {isMe && <span className="bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded uppercase font-bold">You</span>}
                                                 </p>
-                                                <p className="text-xs text-gray-500">{currency}{split.amount.toFixed(2)}</p>
+                                                <p className="text-xs text-gray-500 mt-0.5 font-medium">{currency}{split.amount.toFixed(2)}</p>
                                             </div>
                                             <PaymentBadge status={split.status} />
                                             {isMe && split.status === "pending" && (
                                                 <button
                                                     onClick={() => handlePay(split._id, split.amount)}
                                                     disabled={payingId === split._id || !razorpayReady}
-                                                    className="ml-2 bg-[#ff3f6c] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#e8365d] transition-colors disabled:opacity-60"
+                                                    className="ml-2 bg-[#ff3f6c] text-white text-xs font-bold px-5 py-2.5 rounded-lg hover:bg-[#e8365d] transition-colors disabled:opacity-60 shadow-md shadow-[#ff3f6c]/15"
                                                 >
                                                     {payingId === split._id ? (
                                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -440,6 +527,20 @@ function SplitCheckout() {
                                         </div>
                                     );
                                 })}
+                            </div>
+                        </div>
+
+                        {/* Delivery address display in Step 3 */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <FiTruck className="w-3.5 h-3.5" /> Shipping Address
+                            </h3>
+                            <div className="text-sm text-gray-700 leading-relaxed">
+                                <p className="font-bold">{splitDoc.address.firstName} {splitDoc.address.lastName}</p>
+                                <p>{splitDoc.address.street}</p>
+                                <p>{splitDoc.address.city}, {splitDoc.address.state} {splitDoc.address.pincode}</p>
+                                <p>{splitDoc.address.country}</p>
+                                <p className="text-xs text-gray-500 mt-2 font-medium">Contact: {splitDoc.address.phone}</p>
                             </div>
                         </div>
                     </div>

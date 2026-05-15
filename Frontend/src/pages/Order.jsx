@@ -3,7 +3,7 @@ import { shopDataContext } from '../context/ShopContext'
 import { authDataContext } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { FiPackage, FiShoppingBag, FiCreditCard, FiCalendar, FiRefreshCw, FiChevronRight } from 'react-icons/fi'
+import { FiPackage, FiShoppingBag, FiCreditCard, FiCalendar, FiRefreshCw, FiChevronRight, FiUsers } from 'react-icons/fi'
 
 /* Status pill */
 const StatusPill = ({ status }) => {
@@ -46,6 +46,7 @@ function Order() {
               status: order.status,
               payment: order.payment,
               paymentMethod: order.paymentMethod,
+              participantIds: order.participantIds || [],
               date: order.date,
               orderId: order._id,
             })
@@ -129,6 +130,11 @@ function Order() {
                         <FiCreditCard className="w-3.5 h-3.5" />
                         {item.paymentMethod?.toUpperCase()}
                       </span>
+                      {item.participantIds && item.participantIds.length > 1 && (
+                        <span className="flex items-center gap-1 bg-violet-100 text-violet-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                          <FiUsers className="w-3 h-3" /> Shared Order
+                        </span>
+                      )}
                       <span className="text-gray-400">#{item.orderId?.slice(-8).toUpperCase()}</span>
                     </div>
                     <div className="flex items-center gap-1 text-gray-600">

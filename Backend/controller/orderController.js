@@ -121,7 +121,13 @@ export const PlaceOrder = async (req, res) => {
 export const userOrders = async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ userId });
+        // Find orders where user is either the primary buyer OR a participant in a split
+        const orders = await Order.find({
+            $or: [
+                { userId: userId },
+                { participantIds: userId }
+            ]
+        }).sort({ date: -1 });
         return res.status(200).json(orders);
     } catch (error) {
         console.error("userOrders error:", error);

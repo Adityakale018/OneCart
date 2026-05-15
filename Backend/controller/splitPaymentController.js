@@ -1,5 +1,6 @@
 import SplitPayment from "../model/SplitPaymentModel.js";
 import SharedCart from "../model/SharedCartModel.js";
+import Order from "../model/oderModel.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 
@@ -11,7 +12,7 @@ const razorpay = new Razorpay({
 // ─── POST /api/splitpayment/create ───────────────────────────────────────────
 export const createSplitPayment = async (req, res) => {
     try {
-        const { sharedCartId, totalAmount, splitMode, splits } = req.body;
+        const { sharedCartId, totalAmount, splitMode, splits, address, items } = req.body;
 
         const cart = await SharedCart.findById(sharedCartId);
         if (!cart) return res.status(404).json({ message: "Shared cart not found" });
@@ -24,6 +25,8 @@ export const createSplitPayment = async (req, res) => {
             totalAmount,
             splitMode,
             splits,
+            address,
+            items,
         });
 
         return res.status(201).json({ success: true, splitPayment: splitDoc });
@@ -127,6 +130,31 @@ export const verifyParticipantPayment = async (req, res) => {
         if (allPaid) {
             doc.allPaid = true;
             doc.completedAt = new Date();
+
+            // CREATE THE FINAL ORDER
+            const cart = await SharedCart.findById(doc.sharedCartId);
+            const participantIds = doc.splits.map(s => s.userId.toString());
+
+            const newOrder = new Order({
+                userId: cart.owner,
+                participantIds: participantIds,
+                items: doc.items,
+                amount: doc.totalAmount,
+                address: doc.address,
+                status: "Order Placed",
+                paymentMethod: "Split Payment (Razorpay)",
+                paymentStatus: "Paid",
+                payment: true,
+                date: new Date()
+            });
+
+            const savedOrder = await newOrder.save();
+            doc.orderId = savedOrder._id;
+
+            // Clear the shared cart items
+            cart.items = [];
+            cart.isLocked = true; // Keep it locked after order
+            await cart.save();
         }
 
         await doc.save();
