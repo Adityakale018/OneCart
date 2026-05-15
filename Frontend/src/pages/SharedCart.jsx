@@ -88,6 +88,13 @@ function SharedCart() {
     // Always share cartCode (the short code) not the MongoDB _id
     const inviteUrl = `${window.location.origin}/shared-cart/${cart?.cartCode || cartId}`;
 
+    // Active cart handling
+    useEffect(() => {
+        if (cartId) {
+            localStorage.setItem("activeSharedCartId", cartId);
+        }
+    }, [cartId]);
+
     const copyInvite = () => {
         navigator.clipboard.writeText(inviteUrl);
         setCopied(true);

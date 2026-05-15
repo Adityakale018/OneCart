@@ -2,18 +2,21 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
 import { shopDataContext } from '../context/ShopContext';
 import { FaStar, FaStarHalfAlt, FaRegHeart } from "react-icons/fa";
-import { FiShoppingCart, FiCheck } from "react-icons/fi";
+import { FiShoppingCart, FiCheck, FiUsers } from "react-icons/fi";
+import axios from "axios";
 import RelatedProduct from '../components/RelatedProduct';
 
 function ProductDetail() {
     let {productId} = useParams();
-    let {products, currency, addToCart} = useContext(shopDataContext)
+    let {products, currency, addToCart, serverUrl} = useContext(shopDataContext)
     let navigate = useNavigate()
     let [productData, setProductData] = useState(false)
     const [image, setImage] = useState('')
     const [size, setSize] = useState('')
     const [activeTab, setActiveTab] = useState('description')
     const [addedToCart, setAddedToCart] = useState(false)
+    const [addedToShared, setAddedToShared] = useState(false)
+    const activeSharedCartId = localStorage.getItem("activeSharedCartId");
 
     const FetchProductData = async () => {
         products.map((item) => {
@@ -39,6 +42,24 @@ function ProductDetail() {
         addToCart(productData._id, size)
         setAddedToCart(true)
         setTimeout(() => setAddedToCart(false), 2000)
+    }
+
+    const handleAddToSharedCart = async () => {
+        if(!size) {
+            alert('Please select a size')
+            return
+        }
+        try {
+            await axios.post(`${serverUrl}/api/sharedcart/${activeSharedCartId}/item`, { productId: productData._id, size, quantity: 1 }, { withCredentials: true });
+            setAddedToShared(true);
+            setTimeout(() => {
+                setAddedToShared(false);
+                navigate(`/shared-cart/${activeSharedCartId}`);
+            }, 1000);
+        } catch(e) {
+            console.error(e);
+            alert('Failed to add to shared cart');
+        }
     }
 
   return productData ? (
@@ -167,10 +188,30 @@ function ProductDetail() {
                   </>
                 )}
               </button>
-              <button className='flex-1 h-14 bg-white border border-gray-300 hover:border-gray-400 text-gray-800 font-bold rounded flex items-center justify-center gap-2 transition-colors'>
-                <FaRegHeart className="w-5 h-5" />
-                WISHLIST
-              </button>
+              {activeSharedCartId ? (
+                  <button 
+                    onClick={handleAddToSharedCart}
+                    disabled={addedToShared}
+                    className='flex-1 h-14 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded flex items-center justify-center gap-2 transition-colors disabled:opacity-80'
+                  >
+                    {addedToShared ? (
+                        <>
+                            <FiCheck className='w-5 h-5' />
+                            ADDED
+                        </>
+                    ) : (
+                        <>
+                            <FiUsers className="w-5 h-5" />
+                            ADD TO SHARED CART
+                        </>
+                    )}
+                  </button>
+              ) : (
+                  <button className='flex-1 h-14 bg-white border border-gray-300 hover:border-gray-400 text-gray-800 font-bold rounded flex items-center justify-center gap-2 transition-colors'>
+                    <FaRegHeart className="w-5 h-5" />
+                    WISHLIST
+                  </button>
+              )}
             </div>
 
             <hr className="border-gray-200 my-6" />

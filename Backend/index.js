@@ -105,7 +105,7 @@ io.on("connection", (socket) => {
 
     // ── Chat message ──────────────────────────────────────────────────────────
     socket.on("chat-message", ({ cartId, message, name, timestamp }) => {
-        io.to(cartId).emit("new-chat-message", { message, name, timestamp, userId: socket.userId });
+        socket.to(cartId).emit("new-chat-message", { message, name, timestamp, userId: socket.userId });
     });
 
     // ── Typing / activity indicator ───────────────────────────────────────────
