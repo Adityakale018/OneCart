@@ -28,6 +28,11 @@ function ProductDetail() {
         })
     }
 
+    // Extract brand from name (format: "Brand | Product Name")
+    const hasBrand = productData?.name?.includes(' | ');
+    const brand = hasBrand ? productData.name.split(' | ')[0] : 'OneCart';
+    const productTitle = hasBrand ? productData.name.split(' | ')[1] : productData?.name;
+
     useEffect(() => {
         FetchProductData()
         setSize('')
@@ -112,9 +117,9 @@ function ProductDetail() {
             {/* Product Name */}
             <div>
               <h1 className='text-2xl font-bold text-gray-900 mb-1'>
-                Brand Name
+                {brand}
               </h1>
-              <p className='text-gray-500 text-lg mb-3'>{productData.name}</p>
+              <p className='text-gray-500 text-lg mb-3'>{productTitle}</p>
               
               {/* Rating */}
               <div className='flex items-center gap-3'>

@@ -6,13 +6,17 @@ import { FaHeart, FaStar } from 'react-icons/fa'
 function Card({name, image, id, price}) {
     const {currency} = useContext(shopDataContext)
     let navigate = useNavigate()
+    // Extract brand prefix if present (format: "Brand | Product Name")
+    const hasBrand = name?.includes(' | ');
+    const brand = hasBrand ? name.split(' | ')[0] : 'OneCart';
+    const productName = hasBrand ? name.split(' | ')[1] : name;
     
     return (
         <div 
             className='group w-full bg-white rounded transition-all duration-300 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] relative'
         >
             {/* Image Container */}
-            <div className='relative w-full aspect-[3/4] bg-gray-100 overflow-hidden cursor-pointer' onClick={() => navigate(`/productdetail/${id}`)}>
+            <div className='relative w-full aspect-[3/4] bg-gray-100 overflow-hidden cursor-pointer' onClick={() => { navigate(`/productdetail/${id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <img 
                     src={image} 
                     alt={name}
@@ -38,12 +42,12 @@ function Card({name, image, id, price}) {
             </div>
 
             {/* Product Info */}
-            <div className='p-3' onClick={() => navigate(`/productdetail/${id}`)}>
+            <div className='p-3' onClick={() => { navigate(`/productdetail/${id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <h3 className='text-gray-800 font-bold text-sm truncate'>
-                    BrandName
+                    {brand}
                 </h3>
                 <p className='text-gray-500 text-sm mb-2 truncate'>
-                    {name}
+                    {productName}
                 </p>
                 <div className="flex items-baseline gap-2">
                     <p className='text-gray-900 font-bold text-sm'>

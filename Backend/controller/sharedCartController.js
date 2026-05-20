@@ -4,7 +4,11 @@ import { nanoid } from "nanoid";
 
 // ─── Helper: find shared cart & verify participant ───────────────────────────
 const getCartAndVerify = async (cartId, userId, requireOwner = false) => {
-    const cart = await SharedCart.findById(cartId);
+    // Support both MongoDB ObjectId AND short cartCode from invite links
+    const query = cartId.match(/^[0-9a-fA-F]{24}$/)
+        ? { $or: [{ _id: cartId }, { cartCode: cartId }] }
+        : { cartCode: cartId };
+    const cart = await SharedCart.findOne(query);
     if (!cart) throw { status: 404, message: "Shared cart not found" };
     const isParticipant = cart.participants.some(
         (p) => p.userId.toString() === userId.toString()
