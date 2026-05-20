@@ -104,9 +104,11 @@ function Cart() {
                               className='text-gray-900 font-bold text-sm mb-1 cursor-pointer hover:text-[#ff3f6c] transition-colors truncate'
                               onClick={() => navigate(`/productdetail/${productData._id}`)}
                             >
-                              BrandName
+                              {productData.name?.includes(' | ') ? productData.name.split(' | ')[0] : 'OneCart'}
                             </h3>
-                            <p className="text-gray-500 text-sm truncate mb-2">{productData.name}</p>
+                            <p className="text-gray-500 text-sm truncate mb-2">
+                              {productData.name?.includes(' | ') ? productData.name.split(' | ')[1] : productData.name}
+                            </p>
                             
                             {/* Controls row */}
                             <div className="flex flex-wrap items-center gap-4 mb-3">
