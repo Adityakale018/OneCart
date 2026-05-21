@@ -95,11 +95,19 @@ function Collections() {
           <div className="fixed left-0 top-0 bottom-0 w-72 bg-white z-50 overflow-y-auto p-6 lg:hidden shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-bold text-gray-900">Filters</h3>
-              <button onClick={() => setShowFilter(false)}><FiX className="w-5 h-5 text-gray-500" /></button>
+              <button onClick={() => setShowFilter(false)} className="cursor-pointer text-gray-500 hover:text-gray-800">
+                <FiX className="w-5 h-5" />
+              </button>
             </div>
             <FilterPanel />
+            <button
+              onClick={() => setShowFilter(false)}
+              className="mt-6 w-full bg-[#ff3f6c] hover:bg-[#e8365d] text-white font-bold py-2.5 rounded-lg transition-colors text-sm cursor-pointer text-center"
+            >
+              Apply Filters
+            </button>
             {activeCount > 0 && (
-              <button onClick={clearAll} className="mt-6 w-full border border-[#ff3f6c] text-[#ff3f6c] font-semibold py-2.5 rounded-lg hover:bg-rose-50 transition-colors text-sm">
+              <button onClick={clearAll} className="mt-3 w-full border border-[#ff3f6c] text-[#ff3f6c] font-semibold py-2.5 rounded-lg hover:bg-rose-50 transition-colors text-sm cursor-pointer">
                 Clear All ({activeCount})
               </button>
             )}
@@ -114,16 +122,17 @@ function Collections() {
           <div className="relative w-full">
             <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
+              id="mobile-search-input"
               type="text"
               placeholder="Search products, brands and more..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-11 bg-white border border-gray-200 rounded-xl pl-11 pr-10 text-sm text-gray-855 placeholder-gray-400 focus:outline-none focus:border-[#ff3f6c] focus:ring-1 focus:ring-[#ff3f6c] shadow-sm transition-all"
+              className="w-full h-11 bg-white border border-gray-200 rounded-xl pl-11 pr-10 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#ff3f6c] focus:ring-1 focus:ring-[#ff3f6c] shadow-sm transition-all"
             />
             {search && (
               <button 
                 onClick={() => setSearch('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
               >
                 <FiX className="w-4 h-4" />
               </button>
@@ -132,25 +141,30 @@ function Collections() {
         </div>
 
         {/* Top bar */}
-        <div className="flex items-center justify-between mb-6 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">All Collections</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{filterProduct.length} products</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">All Collections</h1>
+            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{filterProduct.length} products</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             {/* Mobile filter btn */}
             <button
               onClick={() => setShowFilter(true)}
-              className="lg:hidden flex items-center gap-2 text-sm font-semibold border border-gray-300 text-gray-700 rounded-lg px-4 py-2.5 hover:border-gray-400 transition-colors"
+              className="lg:hidden flex-1 flex items-center justify-center gap-2 text-sm font-semibold border border-gray-300 text-gray-700 rounded-lg px-4 py-2.5 hover:border-gray-400 transition-colors cursor-pointer"
             >
               <FiSliders className="w-4 h-4" />
-              Filters {activeCount > 0 && <span className="bg-[#ff3f6c] text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">{activeCount}</span>}
+              <span>Filters</span>
+              {activeCount > 0 && (
+                <span className="bg-[#ff3f6c] text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {activeCount}
+                </span>
+              )}
             </button>
             {/* Sort */}
             <select
               value={sortType}
               onChange={(e) => setSortType(e.target.value)}
-              className="h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:border-[#ff3f6c] cursor-pointer"
+              className="h-10 px-3 flex-1 sm:flex-none bg-white border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:border-[#ff3f6c] cursor-pointer"
             >
               <option value="Relevant">Relevance</option>
               <option value="Low-High">Price: Low to High</option>

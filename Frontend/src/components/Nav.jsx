@@ -123,11 +123,7 @@ function Nav() {
                             <span className='text-[11px] font-semibold mt-1 text-gray-800 group-hover:text-[#ff3f6c] hidden md:block'>Profile</span>
                         </div>
 
-                        {/* Wishlist */}
-                        <div className='hidden md:flex flex-col items-center justify-center cursor-pointer group' onClick={() => navigate("/wishlist")}>
-                            <FaRegHeart className='w-5 h-5 text-gray-800 group-hover:text-[#ff3f6c] transition-colors' />
-                            <span className='text-[11px] font-semibold mt-1 text-gray-800 group-hover:text-[#ff3f6c]'>Wishlist</span>
-                        </div>
+
 
                         {/* Cart */}
                         <div 
@@ -166,9 +162,7 @@ function Nav() {
                                     <li className='px-5 py-2.5 text-gray-700 hover:bg-gray-50 hover:font-semibold cursor-pointer' onClick={() => { navigate("/order"); setshowProfile(false); }}>
                                         Orders
                                     </li>
-                                    <li className='px-5 py-2.5 text-gray-700 hover:bg-gray-50 hover:font-semibold cursor-pointer' onClick={() => { navigate("/wishlist"); setshowProfile(false); }}>
-                                        Wishlist
-                                    </li>
+
                                     <li className='px-5 py-2.5 text-gray-700 hover:bg-gray-50 hover:font-semibold cursor-pointer' onClick={() => { navigate("/about"); setshowProfile(false); }}>
                                         About Us
                                     </li>
@@ -242,8 +236,7 @@ function Nav() {
                 <div className='h-full flex items-center justify-around px-2'>
                     <MobileNavBtn icon={<IoMdHome className='w-6 h-6' />} label="Home" onClick={() => navigate("/")} isActive={isActive("/")} />
                     <MobileNavBtn icon={<HiOutlineCollection className='w-6 h-6' />} label="Shop" onClick={() => navigate("/collection")} isActive={isActive("/collection")} />
-                    <MobileNavBtn icon={<IoSearchOutline className='w-6 h-6' />} label="Search" onClick={() => { navigate("/collection"); setTimeout(() => document.querySelector('input[type="text"]')?.focus(), 100); }} isActive={false} />
-                    <MobileNavBtn icon={<FaRegHeart className='w-[22px] h-[22px]' />} label="Wishlist" onClick={() => navigate("/wishlist")} isActive={isActive("/wishlist")} />
+                    <MobileNavBtn icon={<IoSearchOutline className='w-6 h-6' />} label="Search" onClick={() => { navigate("/collection"); setTimeout(() => document.getElementById('mobile-search-input')?.focus(), 100); }} isActive={false} />
                     <MobileNavBtn icon={<MdOutlineShoppingCart className='w-6 h-6' />} label="Cart" onClick={() => navigate("/cart")} isActive={isActive("/cart")} badge={getCartCount()} />
                 </div>
             </div>
