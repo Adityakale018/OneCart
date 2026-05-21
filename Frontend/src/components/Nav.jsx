@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import logo from "../assets/vcart_logo.png"
+import logo from "../assets/onecart_logo.png"
 import { IoSearchOutline } from "react-icons/io5";
 import { FaRegUser, FaRegHeart } from "react-icons/fa";
 import { MdOutlineShoppingCart, MdContacts } from "react-icons/md";
@@ -76,9 +76,10 @@ function Nav() {
                         </button>
 
                         <div 
-                            className='flex items-center gap-2 cursor-pointer group'
+                            className='flex items-center gap-2.5 cursor-pointer group'
                             onClick={() => navigate("/")}
                         >
+                            <img src={logo} alt="OneCart" className='w-9 h-9 rounded-xl object-cover shadow-sm' />
                             <h1 className='text-2xl font-bold tracking-tight text-gray-900'>One<span className='text-[#ff3f6c]'>Cart</span></h1>
                         </div>
 
@@ -184,7 +185,10 @@ function Nav() {
                 <div className={`fixed inset-0 bg-black/40 z-[100] transition-opacity duration-300 md:hidden ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsMenuOpen(false)}>
                     <div className={`absolute left-0 top-0 bottom-0 w-[280px] bg-white shadow-2xl transition-transform duration-300 ease-out transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`} onClick={e => e.stopPropagation()}>
                         <div className='flex items-center justify-between p-6 border-b border-gray-100'>
-                            <h1 className='text-xl font-bold tracking-tight text-gray-900'>One<span className='text-[#ff3f6c]'>Cart</span></h1>
+                            <div className='flex items-center gap-2.5'>
+                                <img src={logo} alt="OneCart" className='w-9 h-9 rounded-xl object-cover shadow-sm' />
+                                <h1 className='text-xl font-bold tracking-tight text-gray-900'>One<span className='text-[#ff3f6c]'>Cart</span></h1>
+                            </div>
                             <button onClick={() => setIsMenuOpen(false)} className='text-gray-500 hover:text-gray-900'>
                                 <HiX className='w-6 h-6' />
                             </button>
