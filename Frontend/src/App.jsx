@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Registration from './pages/Registration'
 import Login from './pages/Login'
@@ -16,6 +16,7 @@ import Order from './pages/Order';
 import Ai from './components/Ai';
 import SharedCart from './pages/SharedCart';
 import SplitCheckout from './pages/SplitCheckout';
+import SplashScreen from './components/SplashScreen';
 
 /* ─── Protected Route wrapper ────────────────────────────────────── */
 function Protected({ children }) {
@@ -28,11 +29,28 @@ function Protected({ children }) {
 }
 
 function App() {
-    const { userData } = useContext(userDatacontext);
+    const { userData, isAuthLoading } = useContext(userDatacontext);
     const location = useLocation();
+
+    // Splash: show while loading, then trigger exit animation for 600ms
+    const [splashDone, setSplashDone] = useState(false);
+    const [showSplash, setShowSplash] = useState(true);
+
+    useEffect(() => {
+        if (!isAuthLoading) {
+            // Signal exit animation to start
+            setSplashDone(true);
+            // Unmount splash after animation completes
+            const t = setTimeout(() => setShowSplash(false), 650);
+            return () => clearTimeout(t);
+        }
+    }, [isAuthLoading]);
 
     return (
         <>
+            {/* Splash screen overlay */}
+            {showSplash && <SplashScreen onDone={splashDone} />}
+
             {userData && <Nav />}
             <Routes>
                 {/* Auth routes (redirect to home if logged in) */}

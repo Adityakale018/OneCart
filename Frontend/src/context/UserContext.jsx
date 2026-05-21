@@ -8,6 +8,7 @@ export const userDatacontext = createContext()
 
 function UserContext({children}) {
     const [userData, setuserData] = useState("")
+    const [isAuthLoading, setIsAuthLoading] = useState(true)
     let {serverUrl} = useContext(authDataContext)
 
     const getCurrentUser = async () => {
@@ -18,18 +19,18 @@ function UserContext({children}) {
         } catch (error) {
             setuserData(null)
             console.log(error)
+        } finally {
+            setIsAuthLoading(false)
         }
     }
 
     useEffect(() => {
      getCurrentUser()
-    
-      
     }, [])
     
 
     let value = {
-        userData, setuserData,getCurrentUser
+        userData, setuserData, getCurrentUser, isAuthLoading
     }
 
    
@@ -44,3 +45,4 @@ function UserContext({children}) {
 }
 
 export default UserContext
+

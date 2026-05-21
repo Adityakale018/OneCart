@@ -3,17 +3,16 @@ import { shopDataContext } from '../context/ShopContext'
 import { useNavigate } from 'react-router-dom'
 import { FaHeart, FaStar } from 'react-icons/fa'
 import { FiArrowRight } from 'react-icons/fi'
+import { SkeletonGrid, LazyImage } from './Skeleton'
 
 function LatestCollection() {
-  const { products, currency } = useContext(shopDataContext)
+  const { products, currency, isProductLoading } = useContext(shopDataContext)
   const [latestProducts, setLatestProducts] = useState([])
-  const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
   useEffect(() => {
     if (products.length > 0) {
       setLatestProducts(products.slice(0, 10))
-      setLoading(false)
     }
   }, [products])
 
@@ -38,10 +37,8 @@ function LatestCollection() {
           </button>
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="w-10 h-10 border-4 border-[#ff3f6c]/20 border-t-[#ff3f6c] rounded-full animate-spin" />
-          </div>
+        {isProductLoading ? (
+          <SkeletonGrid count={10} />
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -52,8 +49,8 @@ function LatestCollection() {
                   className="group bg-white rounded-xl border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
                 >
                   {/* Image */}
-                  <div className="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden">
-                    <img
+                  <div className="relative w-full aspect-[3/4] overflow-hidden">
+                    <LazyImage
                       src={item.image1} alt={item.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

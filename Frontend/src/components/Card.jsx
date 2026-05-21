@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { shopDataContext } from '../context/ShopContext'
 import { useNavigate } from 'react-router-dom'
 import { FaHeart, FaStar } from 'react-icons/fa'
+import { LazyImage } from './Skeleton'
 
 function Card({name, image, id, price}) {
     const {currency} = useContext(shopDataContext)
@@ -16,9 +17,9 @@ function Card({name, image, id, price}) {
             className='group w-full bg-white rounded transition-all duration-300 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] relative'
         >
             {/* Image Container */}
-            <div className='relative w-full aspect-[3/4] bg-gray-100 overflow-hidden cursor-pointer' onClick={() => { navigate(`/productdetail/${id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                <img 
-                    src={image} 
+            <div className='relative w-full aspect-[3/4] overflow-hidden cursor-pointer' onClick={() => { navigate(`/productdetail/${id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                <LazyImage
+                    src={image}
                     alt={name}
                     className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
                 />

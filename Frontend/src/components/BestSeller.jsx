@@ -3,18 +3,17 @@ import { shopDataContext } from '../context/ShopContext'
 import { useNavigate } from 'react-router-dom'
 import { FaHeart, FaStar } from 'react-icons/fa'
 import { FiArrowRight } from 'react-icons/fi'
+import { SkeletonGrid4, LazyImage } from './Skeleton'
 
 function BestSeller() {
-  const { products, currency } = useContext(shopDataContext)
+  const { products, currency, isProductLoading } = useContext(shopDataContext)
   const [bestSeller, setBestSeller] = useState([])
-  const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
   useEffect(() => {
     if (products.length > 0) {
       const filtered = products.filter((item) => item.bestseller)
       setBestSeller(filtered.slice(0, 8))
-      setLoading(false)
     }
   }, [products])
 
@@ -39,10 +38,8 @@ function BestSeller() {
           </button>
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="w-10 h-10 border-4 border-[#ff3f6c]/20 border-t-[#ff3f6c] rounded-full animate-spin" />
-          </div>
+        {isProductLoading ? (
+          <SkeletonGrid4 count={8} />
         ) : bestSeller.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-center">
             <span className="text-5xl mb-4">⭐</span>
@@ -69,8 +66,8 @@ function BestSeller() {
                     ⭐ BESTSELLER
                   </div>
                   {/* Image */}
-                  <div className="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden">
-                    <img
+                  <div className="relative w-full aspect-[3/4] overflow-hidden">
+                    <LazyImage
                       src={item.image1} alt={item.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

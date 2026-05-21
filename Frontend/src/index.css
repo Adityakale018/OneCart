@@ -25,3 +25,51 @@ html, body, #root {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ── Shimmer skeleton animation ──────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+/* ── Splash screen logo pulse ─────────────────────────── */
+@keyframes splash-scale {
+  0%, 100% { transform: scale(1);   opacity: 1;   }
+  50%       { transform: scale(1.1); opacity: 0.85; }
+}
+.splash-logo {
+  animation: splash-scale 1.1s ease-in-out infinite;
+}
+
+/* ── Progress bar ─────────────────────────────────────── */
+@keyframes progress-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%);  }
+}
+.progress-bar-inner {
+  animation: progress-slide 1.4s ease-in-out infinite;
+}
+
+/* ── Img blur-up fade ─────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.img-fade {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* ── Splash slide-up exit ─────────────────────────────── */
+@keyframes splash-exit {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-100%); }
+}
+.splash-exit {
+  animation: splash-exit 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

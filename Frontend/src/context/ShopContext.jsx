@@ -7,6 +7,7 @@ import { userDatacontext } from './UserContext'
 function ShopContext({children}) {
 
     let [products,setProducts] =useState([])
+    let [isProductLoading, setIsProductLoading] = useState(true)
     let {serverUrl} = useContext(authDataContext)
     let {userData} = useContext(userDatacontext)
     let [search,setSearch] = useState('')
@@ -17,11 +18,14 @@ function ShopContext({children}) {
 
     const getProducts = async () => {
         try {
+            setIsProductLoading(true)
             let result = await axios.get(serverUrl + "/api/product/list")
             console.log(result.data)
             setProducts(result.data)
         } catch (error) {
             console.log(error)
+        } finally {
+            setIsProductLoading(false)
         }
     }
 
@@ -125,6 +129,7 @@ function ShopContext({children}) {
 
     let value = {
         products,
+        isProductLoading,
         currency,
         delivery_fee,
         getProducts,
