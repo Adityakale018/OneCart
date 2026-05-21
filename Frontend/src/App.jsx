@@ -21,8 +21,17 @@ import ScrollToTop from './components/ScrollToTop';
 
 /* ─── Protected Route wrapper ────────────────────────────────────── */
 function Protected({ children }) {
-    const { userData } = useContext(userDatacontext);
+    const { userData, isAuthLoading } = useContext(userDatacontext);
     const location = useLocation();
+
+    if (isAuthLoading) {
+        return (
+            <div className="w-full min-h-screen bg-white flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-[#ff3f6c]/30 border-t-[#ff3f6c] rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
     if (!userData) {
         return <Navigate to="/login" state={{ from: location.pathname }} replace />;
     }
@@ -33,18 +42,33 @@ function App() {
     const { userData, isAuthLoading } = useContext(userDatacontext);
     const location = useLocation();
 
-    // Splash: show while loading, then trigger exit animation for 600ms
+    // Splash: show while loading, then trigger exit animation for 650ms
     const [splashDone, setSplashDone] = useState(false);
     const [showSplash, setShowSplash] = useState(true);
 
     useEffect(() => {
+        let isCancelled = false;
+        let t;
+
+        // Force splash to exit after 2.3 seconds (max 3 seconds total loading time including 650ms animation)
+        const fallbackTimer = setTimeout(() => {
+            if (!isCancelled) {
+                setSplashDone(true);
+                t = setTimeout(() => setShowSplash(false), 650);
+            }
+        }, 2350);
+
         if (!isAuthLoading) {
-            // Signal exit animation to start
+            clearTimeout(fallbackTimer);
             setSplashDone(true);
-            // Unmount splash after animation completes
-            const t = setTimeout(() => setShowSplash(false), 650);
-            return () => clearTimeout(t);
+            t = setTimeout(() => setShowSplash(false), 650);
         }
+
+        return () => {
+            isCancelled = true;
+            clearTimeout(fallbackTimer);
+            if (t) clearTimeout(t);
+        };
     }, [isAuthLoading]);
 
     return (
