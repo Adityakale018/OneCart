@@ -17,6 +17,7 @@ import Ai from './components/Ai';
 import SharedCart from './pages/SharedCart';
 import SplitCheckout from './pages/SplitCheckout';
 import SplashScreen from './components/SplashScreen';
+import ScrollToTop from './components/ScrollToTop';
 
 /* ─── Protected Route wrapper ────────────────────────────────────── */
 function Protected({ children }) {
@@ -50,6 +51,9 @@ function App() {
         <>
             {/* Splash screen overlay */}
             {showSplash && <SplashScreen onDone={splashDone} />}
+
+            {/* Scroll to top on every route change */}
+            <ScrollToTop />
 
             {userData && <Nav />}
             <Routes>

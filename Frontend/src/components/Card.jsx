@@ -17,7 +17,7 @@ function Card({name, image, id, price}) {
             className='group w-full bg-white rounded transition-all duration-300 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] relative'
         >
             {/* Image Container */}
-            <div className='relative w-full aspect-[3/4] overflow-hidden cursor-pointer' onClick={() => { navigate(`/productdetail/${id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+            <div className='relative w-full aspect-[3/4] overflow-hidden cursor-pointer' onClick={() => navigate(`/productdetail/${id}`)}>
                 <LazyImage
                     src={image}
                     alt={name}
@@ -43,7 +43,7 @@ function Card({name, image, id, price}) {
             </div>
 
             {/* Product Info */}
-            <div className='p-3' onClick={() => { navigate(`/productdetail/${id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+            <div className='p-3' onClick={() => navigate(`/productdetail/${id}`)}>
                 <h3 className='text-gray-800 font-bold text-sm truncate'>
                     {brand}
                 </h3>
