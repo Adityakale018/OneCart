@@ -5,6 +5,7 @@ import { FaStar, FaStarHalfAlt, FaRegHeart } from "react-icons/fa";
 import { FiShoppingCart, FiCheck, FiUsers } from "react-icons/fi";
 import axios from "axios";
 import RelatedProduct from '../components/RelatedProduct';
+import Footer from '../components/Footer';
 
 function ProductDetail() {
     let {productId} = useParams();
@@ -323,6 +324,7 @@ function ProductDetail() {
           currentProductId={productData._id} 
         />
       </div>
+      <Footer />
     </div>
   ) : (
     <div className='w-full min-h-screen bg-white flex items-center justify-center'>

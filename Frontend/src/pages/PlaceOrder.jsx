@@ -110,7 +110,7 @@ function PlaceOrder() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 pb-24 md:pb-8">
         <form onSubmit={onSubmit}>
           <div className="grid lg:grid-cols-[1fr_380px] gap-6">
 

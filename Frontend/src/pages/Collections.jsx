@@ -3,10 +3,11 @@ import { FaChevronDown } from "react-icons/fa";
 import { FiSliders, FiX, FiSearch } from "react-icons/fi";
 import { shopDataContext } from '../context/ShopContext';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 function Collections() {
   const [showFilter, setShowFilter] = useState(false)
-  const { products, search, showSearch } = useContext(shopDataContext)
+  const { products, search, setSearch } = useContext(shopDataContext)
   const [filterProduct, setFilterProduct] = useState([])
   const [category, setCategory] = useState([])
   const [subCategory, setSubCategory] = useState([])
@@ -23,7 +24,7 @@ function Collections() {
   }
   const applyFilter = () => {
     let copy = products.slice()
-    if (showSearch && search) copy = copy.filter(i => i.name.toLowerCase().includes(search.toLowerCase()))
+    if (search) copy = copy.filter(i => i.name.toLowerCase().includes(search.toLowerCase()))
     if (category.length > 0) copy = copy.filter(i => category.includes(i.category))
     if (subCategory.length > 0) copy = copy.filter(i => subCategory.includes(i.subCategory))
     setFilterProduct(copy)
@@ -36,7 +37,7 @@ function Collections() {
   }
 
   useEffect(() => { setFilterProduct(products) }, [products])
-  useEffect(() => { applyFilter() }, [category, subCategory, search, showSearch, products])
+  useEffect(() => { applyFilter() }, [category, subCategory, search, products])
   useEffect(() => { sortProducts() }, [sortType])
 
   const clearAll = () => { setCategory([]); setSubCategory([]) }
@@ -107,6 +108,28 @@ function Collections() {
       )}
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        {/* Mobile Search Bar */}
+        <div className="md:hidden w-full mb-5">
+          <div className="relative w-full">
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search products, brands and more..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full h-11 bg-white border border-gray-200 rounded-xl pl-11 pr-10 text-sm text-gray-855 placeholder-gray-400 focus:outline-none focus:border-[#ff3f6c] focus:ring-1 focus:ring-[#ff3f6c] shadow-sm transition-all"
+            />
+            {search && (
+              <button 
+                onClick={() => setSearch('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+              >
+                <FiX className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Top bar */}
         <div className="flex items-center justify-between mb-6 gap-4">
@@ -230,6 +253,7 @@ function Collections() {
           </main>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

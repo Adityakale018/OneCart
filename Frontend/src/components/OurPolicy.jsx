@@ -37,7 +37,7 @@ const perks = [
 
 function OurPolicy() {
   return (
-    <section className="w-full py-16 bg-white border-t border-gray-100">
+    <section className="w-full py-12 md:py-16 bg-white border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -48,7 +48,7 @@ function OurPolicy() {
         </div>
 
         {/* Policy cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-10">
           {policies.map(({ icon: Icon, bg, iconColor, title, desc }) => (
             <div
               key={title}
@@ -64,19 +64,19 @@ function OurPolicy() {
         </div>
 
         {/* Perks strip */}
-        <div className="bg-[#ff3f6c] rounded-2xl py-6 px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-white text-center">
+        <div className="bg-[#ff3f6c] rounded-2xl py-5 px-4 sm:py-6 sm:px-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 text-white text-center">
             {perks.map(({ icon: Icon, label, sub }) => (
-              <div key={label} className="flex flex-col items-center gap-1">
+              <div key={label} className="flex flex-col items-center gap-1.5 py-1">
                 {typeof Icon === 'string' ? (
-                  <span className="text-2xl">{Icon}</span>
+                  <span className="text-xl sm:text-2xl">{Icon}</span>
                 ) : (
-                  <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
-                    <Icon className="w-4.5 h-4.5" />
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 bg-white/20 rounded-full flex items-center justify-center">
+                    <Icon className="w-4 h-4" />
                   </div>
                 )}
-                <p className="font-bold text-sm">{label}</p>
-                <p className="text-rose-100 text-xs">{sub}</p>
+                <p className="font-bold text-xs sm:text-sm">{label}</p>
+                <p className="text-rose-100 text-[10px] sm:text-xs">{sub}</p>
               </div>
             ))}
           </div>

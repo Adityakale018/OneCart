@@ -28,11 +28,12 @@ function Home() {
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden">
       {/* HERO SECTION */}
-      <section className="w-full h-auto md:h-[700px] bg-[#fbe7eb]">
-        <div className="w-full h-full flex flex-col-reverse md:flex-row max-w-[1600px] mx-auto">
+      <section className="w-full bg-[#fbe7eb]">
+        {/* Mobile: text on top, image below — Desktop: side by side */}
+        <div className="w-full flex flex-col md:flex-row md:h-[700px] max-w-[1600px] mx-auto">
 
-          {/* LEFT - Hero Text */}
-          <div className="w-full md:w-1/2 min-h-[400px] md:h-full bg-[#fbe7eb]">
+          {/* LEFT - Hero Text (shows first on mobile, left on desktop) */}
+          <div className="w-full md:w-1/2 min-h-[320px] md:h-full bg-[#fbe7eb]">
             <Hero
               heroData={heroData[heroCount]}
               heroCount={heroCount}
@@ -41,24 +42,25 @@ function Home() {
           </div>
 
           {/* RIGHT - Background Image */}
-          <div className="w-full md:w-1/2 h-[400px] md:h-full">
+          <div className="w-full md:w-1/2 h-[280px] sm:h-[360px] md:h-full">
             <Background heroCount={heroCount} />
           </div>
-          
+
         </div>
       </section>
 
       {/* PRODUCTS SECTION */}
-      <section className="w-full bg-white max-w-[1600px] mx-auto pt-16">
+      <section className="w-full bg-white">
         <Product />
       </section>
 
-      {/* OTHER SECTIONS */}
-      <section className="w-full bg-white max-w-[1600px] mx-auto">
+      {/* POLICY SECTION */}
+      <section className="w-full bg-white">
         <OurPolicy />
       </section>
 
-      <section className="w-full bg-white max-w-[1600px] mx-auto">
+      {/* NEWSLETTER SECTION */}
+      <section className="w-full bg-white">
         <NewLetterBox />
       </section>
 

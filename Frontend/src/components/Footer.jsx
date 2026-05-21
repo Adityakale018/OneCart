@@ -6,12 +6,12 @@ function Footer() {
   const navigate = useNavigate()
 
   return (
-    <footer className='w-full bg-[#FAFBFC] border-t border-gray-200 mt-16 md:mt-24 pb-16 md:pb-0'>
-      <div className='max-w-[1600px] mx-auto px-4 lg:px-12 py-12 md:py-16'>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8'>
+    <footer className='w-full bg-[#FAFBFC] border-t border-gray-200 pb-24 md:pb-0'>
+      <div className='max-w-[1600px] mx-auto px-4 lg:px-12 py-10 md:py-16'>
+        <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-8'>
           
           {/* Brand Section */}
-          <div className='lg:col-span-2'>
+          <div className='col-span-2 lg:col-span-2'>
             <div className='flex items-center gap-2 mb-6 cursor-pointer' onClick={() => navigate('/')}>
                <h3 className='text-2xl font-bold tracking-tight text-gray-900'>One<span className='text-[#ff3f6c]'>Cart</span></h3>
             </div>

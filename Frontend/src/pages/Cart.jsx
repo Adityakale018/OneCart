@@ -28,7 +28,7 @@ function Cart() {
     }, [cartItem])
 
   return (
-    <div className='w-full min-h-screen bg-[#f5f5f6] overflow-x-hidden pb-16'>
+    <div className='w-full min-h-screen bg-[#f5f5f6] overflow-x-hidden pb-28 md:pb-16'>
       <div className='pt-8 md:pt-12 px-4 sm:px-6 lg:px-8 max-w-[1200px] mx-auto'>
         
         {cartData.length === 0 ? (

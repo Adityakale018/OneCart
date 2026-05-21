@@ -14,7 +14,7 @@ function NewLetterBox() {
   }
 
   return (
-    <section className="relative w-full py-20 bg-gradient-to-br from-[#ff3f6c] to-rose-500 overflow-hidden">
+    <section className="relative w-full py-14 sm:py-20 bg-gradient-to-br from-[#ff3f6c] to-rose-500 overflow-hidden">
       {/* Decorative blobs */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-white/10 rounded-full translate-x-1/2 translate-y-1/2" />
@@ -24,10 +24,10 @@ function NewLetterBox() {
           <FiMail className="w-7 h-7 text-white" />
         </div>
 
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3">
           Get <span className="underline decoration-white/50">20% Off</span> Your First Order
         </h2>
-        <p className="text-rose-100 text-base sm:text-lg mb-8">
+        <p className="text-rose-100 text-sm sm:text-base md:text-lg mb-6 sm:mb-8">
           Subscribe for exclusive deals and early access to new collections.
         </p>
 
@@ -38,11 +38,11 @@ function NewLetterBox() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
-              className="flex-1 h-13 bg-white/90 border-2 border-white/50 rounded-xl px-4 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-white focus:bg-white transition-all py-3.5"
+              className="flex-1 bg-white/90 border-2 border-white/50 rounded-xl px-4 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-white focus:bg-white transition-all py-3.5"
             />
             <button
               type="submit"
-              className="h-13 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl px-6 flex items-center justify-center gap-2 transition-colors shadow-lg py-3.5 whitespace-nowrap"
+              className="bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl px-6 flex items-center justify-center gap-2 transition-colors shadow-lg py-3.5 whitespace-nowrap"
             >
               Subscribe <FiSend className="w-4 h-4" />
             </button>
