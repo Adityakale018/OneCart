@@ -37,7 +37,6 @@ function ProductDetail() {
         FetchProductData()
         setSize('')
         setAddedToCart(false)
-        window.scrollTo(0, 0)
     }, [productId, products])
 
     const handleAddToCart = () => {

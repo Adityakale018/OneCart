@@ -181,7 +181,7 @@ function Collections() {
                 {filterProduct.map((item, index) => (
                   <div
                     key={item._id || index}
-                    onClick={() => { navigate(`/productdetail/${item._id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    onClick={() => navigate(`/productdetail/${item._id}`)}
                     className="group bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
                   >
                     {/* Image */}
@@ -205,11 +205,8 @@ function Collections() {
                     </div>
                     {/* Info */}
                     <div className="p-3">
-                      <p className="text-xs font-bold text-gray-800 truncate">
-                        {item.name?.includes(' | ') ? item.name.split(' | ')[0] : 'OneCart'}
-                      </p>
-                      <h3 className="text-sm font-semibold text-gray-500 truncate group-hover:text-[#ff3f6c] transition-colors mb-1">
-                        {item.name?.includes(' | ') ? item.name.split(' | ')[1] : item.name}
+                      <h3 className="text-sm font-semibold text-gray-900 truncate group-hover:text-[#ff3f6c] transition-colors">
+                        {item.name}
                       </h3>
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-[#ff3f6c] font-bold text-sm">₹{item.price}</p>

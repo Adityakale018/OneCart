@@ -73,12 +73,8 @@ function LatestCollection() {
                   </div>
                   {/* Info */}
                   <div className="p-3">
-                    <p className="text-xs font-bold text-gray-800 truncate">
-                      {item.name?.includes(' | ') ? item.name.split(' | ')[0] : 'OneCart'}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate mb-1.5">
-                      {item.name?.includes(' | ') ? item.name.split(' | ')[1] : item.name}
-                    </p>
+                    <p className="text-xs font-bold text-gray-800 truncate">BrandName</p>
+                    <p className="text-xs text-gray-500 truncate mb-1.5">{item.name}</p>
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-sm font-bold text-gray-900">{currency}{item.price}</span>
                       <span className="text-xs text-gray-400 line-through">{currency}{Math.round(item.price * 1.3)}</span>
