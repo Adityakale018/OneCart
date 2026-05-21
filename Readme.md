@@ -19,6 +19,14 @@
 - Cart & Checkout
 - Online Payments
 - Order Management
+- Shared Cart Collaboration
+- Split Payment System
+- Smart AI Shopping Assistant
+- Product Search & Filtering
+- Wishlist Support
+- Order Tracking
+- Responsive UI
+- Cloud Image Upload
 
 ## ▶️ How to Run Locally
 
