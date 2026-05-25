@@ -14,7 +14,8 @@ function ShopContext({children}) {
     let [showSearch,setShowSearch] = useState(false)
     let [cartItem,setCartItem] = useState({})
     let currency = "₹"
-    let delivery_fee = 50;
+    const DELIVERY_FEE = 50;
+    const FREE_DELIVERY_ABOVE = 499;
 
     const getProducts = async () => {
         try {
@@ -127,11 +128,15 @@ function ShopContext({children}) {
     },[])
 
 
+    // Delivery is free when subtotal exceeds FREE_DELIVERY_ABOVE
+    const delivery_fee = getTotalAmount() > FREE_DELIVERY_ABOVE ? 0 : DELIVERY_FEE;
+
     let value = {
         products,
         isProductLoading,
         currency,
         delivery_fee,
+        FREE_DELIVERY_ABOVE,
         getProducts,
         showSearch,setShowSearch,
         search,setSearch,
