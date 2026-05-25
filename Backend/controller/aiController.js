@@ -16,7 +16,8 @@ export const aiChat = async (req, res) => {
         // Extract keywords from user message for product lookup
         const searchTerms = message
             .replace(/[₹\$]/g, "")
-            .replace(/under|below|less than|around|budget|for|me|suggest|show|find|need|want/gi, "")
+            .replace(/under|below|less than|within|around|budget|for|me|suggest|show|find|need|want|buy|give|get/gi, "")
+            .replace(/\s+/g, " ")
             .trim();
 
         // Budget extraction
@@ -27,11 +28,13 @@ export const aiChat = async (req, res) => {
         let productQuery = {};
         if (budget) productQuery.price = { $lte: budget };
         if (searchTerms.length > 2) {
+            // Escape special regex chars to avoid "Invalid regular expression" errors
+            const escapedTerms = searchTerms.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
             productQuery.$or = [
-                { name: { $regex: searchTerms, $options: "i" } },
-                { category: { $regex: searchTerms, $options: "i" } },
-                { subCategory: { $regex: searchTerms, $options: "i" } },
-                { description: { $regex: searchTerms, $options: "i" } },
+                { name: { $regex: escapedTerms, $options: "i" } },
+                { category: { $regex: escapedTerms, $options: "i" } },
+                { subCategory: { $regex: escapedTerms, $options: "i" } },
+                { description: { $regex: escapedTerms, $options: "i" } },
             ];
         }
 
@@ -118,7 +121,14 @@ INSTRUCTIONS:
             products: recommendedProducts,
         });
     } catch (error) {
-        console.error("aiChat error:", error);
+        console.error("aiChat error:", error?.message || error);
+        // Check for common Gemini API errors
+        if (error?.message?.includes("API key") || error?.status === 400 || error?.status === 403) {
+            return res.status(500).json({ message: "AI configuration error: Invalid or missing API key." });
+        }
+        if (error?.message?.includes("quota") || error?.status === 429) {
+            return res.status(429).json({ message: "AI rate limit reached. Please try again in a moment." });
+        }
         return res.status(500).json({ message: `AI chat error: ${error.message}` });
     }
 };

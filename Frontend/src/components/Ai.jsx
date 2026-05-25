@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect, useRef, useCallback } from "rea
 import { shopDataContext } from "../context/ShopContext";
 import { authDataContext } from "../context/AuthContext";
 import { userDatacontext } from "../context/UserContext";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FiSend, FiX, FiShoppingCart, FiMic, FiMicOff } from "react-icons/fi";
 import { BsStars, BsRobot } from "react-icons/bs";
@@ -212,11 +211,15 @@ function Ai() {
                 },
             ]);
         } catch (err) {
+            console.error("AI chat error:", err?.response?.data || err?.message || err);
+            const errMsg = err?.response?.data?.message || err?.message;
             setMessages((prev) => [
                 ...prev,
                 {
                     role: "assistant",
-                    content: "Sorry, I'm having trouble connecting right now. Please try again in a moment! 🙏",
+                    content: errMsg
+                        ? `⚠️ Error: ${errMsg}`
+                        : "Sorry, I'm having trouble connecting right now. Please check if you're logged in and try again! 🙏",
                     products: [],
                 },
             ]);
@@ -376,13 +379,28 @@ function Ai() {
                     {/* Input area */}
                     <div className="bg-white border-t border-gray-100 p-3">
                         <form onSubmit={handleSubmit} className="flex gap-2 items-end">
+                            {/* Voice input button */}
+                            {recognition && (
+                                <button
+                                    type="button"
+                                    onClick={toggleVoice}
+                                    title={isListening ? "Stop listening" : "Speak your query"}
+                                    className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                                        isListening
+                                            ? "bg-red-500 text-white animate-pulse"
+                                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                    }`}
+                                >
+                                    {isListening ? <FiMicOff className="w-4 h-4" /> : <FiMic className="w-4 h-4" />}
+                                </button>
+                            )}
                             <div className="flex-1 bg-gray-100 rounded-xl px-3 py-2">
                                 <input
                                     ref={inputRef}
                                     type="text"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Ask me anything..."
+                                    placeholder={isListening ? "Listening... 🎤" : "Ask me anything..."}
                                     disabled={loading}
                                     className="w-full bg-transparent text-sm text-gray-800 focus:outline-none placeholder-gray-400"
                                 />
