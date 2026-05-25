@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, useRef, useCallback } from "rea
 import { shopDataContext } from "../context/ShopContext";
 import { authDataContext } from "../context/AuthContext";
 import { userDatacontext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FiSend, FiX, FiShoppingCart, FiMic, FiMicOff } from "react-icons/fi";
 import { BsStars, BsRobot } from "react-icons/bs";
