@@ -1,5 +1,6 @@
 import Product from "../model/productModel.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import fs from "fs";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -151,3 +152,103 @@ export const getAiSuggestions = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+// ─── POST /api/ai/generate-product-details ────────────────────────────────────
+// Accepts an uploaded image and uses Gemini Vision to auto-fill product details
+export const generateProductDetails = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "Image file is required" });
+        }
+
+        // Read the uploaded image and convert to base64
+        const imagePath = req.file.path;
+        const imageBuffer = fs.readFileSync(imagePath);
+        const base64Image = imageBuffer.toString("base64");
+        const mimeType = req.file.mimetype || "image/jpeg";
+
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+        const prompt = `You are an expert e-commerce product analyst for an Indian fashion & clothing store.
+
+Analyze this product image carefully and return a JSON object with the following fields:
+
+{
+  "name": "<A catchy, descriptive product title (e.g. 'Classic Oxford Button-Down Shirt')>",
+  "description": "<A compelling 2-3 sentence product description that highlights key features, fabric, and style. Make it SEO-friendly and engaging.>",
+  "category": "<MUST be exactly one of: Men, Women, Kids>",
+  "subCategory": "<MUST be exactly one of: TopWear, BottomWear, WinterWear>",
+  "price": <A realistic Indian market price as a number only (no ₹ symbol), e.g. 1299>,
+  "sizes": <An array of applicable sizes from ["S", "M", "L", "XL", "XXL"], e.g. ["S","M","L","XL"]>,
+  "bestseller": <true if it looks like a popular/trendy item, false otherwise>
+}
+
+Rules:
+- category MUST be one of: Men, Women, Kids
+- subCategory MUST be one of: TopWear, BottomWear, WinterWear
+- price must be a realistic number in Indian Rupees (INR), no symbols
+- sizes must be a valid JSON array with elements from ["S", "M", "L", "XL", "XXL"]
+- Return ONLY the raw JSON object, no markdown, no explanation, no code fences.`;
+
+        const result = await model.generateContent([
+            prompt,
+            {
+                inlineData: {
+                    mimeType,
+                    data: base64Image,
+                },
+            },
+        ]);
+
+        const rawText = result.response.text().trim();
+
+        // Clean up response (remove markdown code fences if present)
+        const cleaned = rawText
+            .replace(/^```json\s*/i, "")
+            .replace(/^```\s*/i, "")
+            .replace(/```\s*$/i, "")
+            .trim();
+
+        let productData;
+        try {
+            productData = JSON.parse(cleaned);
+        } catch (parseErr) {
+            console.error("Gemini returned non-JSON:", rawText);
+            return res.status(500).json({
+                message: "AI returned an unexpected format. Please try again.",
+            });
+        }
+
+        // Sanitize and validate fields
+        const validCategories = ["Men", "Women", "Kids"];
+        const validSubCategories = ["TopWear", "BottomWear", "WinterWear"];
+        const validSizes = ["S", "M", "L", "XL", "XXL"];
+
+        const sanitized = {
+            name: String(productData.name || "").trim(),
+            description: String(productData.description || "").trim(),
+            category: validCategories.includes(productData.category) ? productData.category : "Men",
+            subCategory: validSubCategories.includes(productData.subCategory) ? productData.subCategory : "TopWear",
+            price: Number(productData.price) > 0 ? Number(productData.price) : 999,
+            sizes: Array.isArray(productData.sizes)
+                ? productData.sizes.filter((s) => validSizes.includes(s))
+                : ["S", "M", "L"],
+            bestseller: Boolean(productData.bestseller),
+        };
+
+        // Cleanup uploaded temp file
+        try { fs.unlinkSync(imagePath); } catch (_) {}
+
+        return res.status(200).json({ success: true, product: sanitized });
+    } catch (error) {
+        console.error("generateProductDetails error:", error?.message || error);
+        if (error?.message?.includes("API key") || error?.status === 403) {
+            return res.status(500).json({ message: "AI configuration error: Invalid or missing API key." });
+        }
+        if (error?.message?.includes("quota") || error?.status === 429) {
+            return res.status(429).json({ message: "AI rate limit reached. Please try again in a moment." });
+        }
+        return res.status(500).json({ message: `AI generate error: ${error.message}` });
+    }
+};
+
