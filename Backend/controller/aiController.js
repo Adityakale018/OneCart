@@ -167,7 +167,7 @@ export const generateProductDetails = async (req, res) => {
         const base64Image = imageBuffer.toString("base64");
         const mimeType = req.file.mimetype || "image/jpeg";
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `You are an expert e-commerce product analyst for an Indian fashion & clothing store.
 
