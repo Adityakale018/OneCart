@@ -95,3 +95,8 @@ jobs:
         run: curl "$RENDER_BACKEND_DEPLOY_HOOK"
         env:
           RENDER_BACKEND_DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
+
+      - name: Deploy frontend to Render
+        run: curl "$RENDER_FRONTEND_DEPLOY_HOOK"
+        env:
+          RENDER_FRONTEND_DEPLOY_HOOK: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
