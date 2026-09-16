@@ -78,11 +78,15 @@ jobs:
         with:
           context: ./Backend
           push: true
-          tags: adityakale13105/onecart-backend:latest
+          tags: |
+                adityakale13105/onecart-backend:latest
+                adityakale13105/onecart-backend:${{ github.sha }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
         with:
           context: ./Frontend
           push: true
-          tags: adityakale13105/onecart-frontend:latest
+          tags: |
+                adityakale13105/onecart-frontend:latest
+                adityakale13105/onecart-frontend:${{ github.sha }}
