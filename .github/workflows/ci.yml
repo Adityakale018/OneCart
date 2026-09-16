@@ -28,6 +28,10 @@ jobs:
         working-directory: Frontend
         run: npm install
 
+      - name: Run frontend lint
+        working-directory: Frontend
+        run: npm run lint
+
       - name: Build frontend
         working-directory: Frontend
         run: npm run build
@@ -90,3 +94,8 @@ jobs:
           tags: |
                 adityakale13105/onecart-frontend:latest
                 adityakale13105/onecart-frontend:${{ github.sha }}
+
+      - name: Deploy backend to Render
+        run: curl "$RENDER_BACKEND_DEPLOY_HOOK"
+        env:
+          RENDER_BACKEND_DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
